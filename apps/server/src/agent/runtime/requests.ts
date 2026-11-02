@@ -14,6 +14,35 @@ function contentHash(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+const responseIdleTimeout = 120000;
+
+// ACT: SDK 读到连接关闭才结束本轮，供应商不收尾时工具永远不会执行。120 秒无字节按超时处理；不覆盖等待响应头的阶段，也可能误伤长时间不发心跳的供应商。
+// 错误文本不翻译，SDK 靠其中的 timeout 判定为可重试。
+function withResponseIdleTimeout(response: Response) {
+  if (!response.ok || !response.body) return response;
+  const reader = response.body.getReader();
+  const body = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const idle = new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => reject(new Error(`Model response stream timeout: no data for ${responseIdleTimeout / 1000} seconds`)), responseIdleTimeout);
+      });
+      try {
+        const { value, done } = await Promise.race([reader.read(), idle]);
+        if (done) controller.close();
+        else controller.enqueue(value);
+      } catch (error) {
+        controller.error(error);
+        void reader.cancel(error).catch(() => {});
+      } finally {
+        clearTimeout(timer);
+      }
+    },
+    cancel: reason => reader.cancel(reason),
+  });
+  return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
+}
+
 export function configureAgentRequests(session: AgentSession, limits?: { maxRequestImageBytes?: number; maxRequestBytes?: number }, runSignal?: AbortSignal, onRetry?: (replyTo?: string) => void) {
   for (const value of Object.values(limits ?? {})) {
     if (value !== undefined && (!Number.isSafeInteger(value) || value <= 0)) throw new Error("图片请求预算必须为正安全整数");
@@ -290,7 +319,7 @@ export function configureAgentRequests(session: AgentSession, limits?: { maxRequ
                 });
               }
               const response = await request(input, { ...init, signal });
-              if (response.status !== 413) return response;
+              if (response.status !== 413) return withResponseIdleTimeout(response);
               http413 = true;
               const headers = new Headers(response.headers);
               headers.set("x-should-retry", "false");
