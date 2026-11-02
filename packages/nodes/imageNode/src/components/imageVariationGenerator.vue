@@ -15,7 +15,7 @@
         <label>比例<el-select v-model="settings.ratio" :disabled="busy" :aria-label="`${label}比例`" @change="ratioFromSource = false"><el-option v-for="ratio in ratioOptions" :key="ratio" :label="ratio" :value="ratio" /></el-select></label>
       </div>
     </el-popover>
-    <el-button type="primary" :icon="IconSparkles" :loading="generating" :disabled="busy || modelsLoading || !source || !selectedModel || !prompt.trim()" @click="generate">{{ buttonLabel ?? '生成图片' }}</el-button>
+    <el-button type="primary" :icon="IconSparkles" :loading="generating" :disabled="busy || modelsLoading || !source || !selectedModel || !prompt.trim()" @click="generate">创建{{ label }}节点</el-button>
   </footer>
 </template>
 
@@ -110,7 +110,7 @@ async function generate() {
     if (!createdNode || findNode(nodeId) !== createdNode || !getEdges.value.some(edge => edge.id === edgeId && edge.source === id && edge.sourceHandle === "image" && edge.target === nodeId && edge.targetHandle === "in")) {
       throw new Error("新节点或原图连接已变化，请在新节点中检查后生成");
     }
-    await getNodeTools().call({ nodeId, name: "node:generateImage", args: {} }, controller.signal);
+    // 本地改动：只建好节点（提示词、参考图、模型都已填好），不自动生成；在新节点里确认或换模型后再手动生成。
     emit("generated");
   } catch (error) { if (!controller.signal.aborted && !disposed) showNodeError(error, `${props.label}失败`); }
   finally { generating.value = false; generationController = undefined; }
