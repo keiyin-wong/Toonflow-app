@@ -3,7 +3,7 @@
 本流程有三个独立确认停点，不能一次越过。所有成果留在当前集画布，例如 `画布/分集/第001集.json`。
 具体节点、工具发现、状态与文件操作见 [canvasOperations.md](canvasOperations.md)。
 
-准备前读取 [视频模式、模型模板与声音知识](knowledge/videoPromptCraft.md)：先读模式选择和共用约束，再完整读本次实际适用的 Seedance 三段、Wan 单首帧、通用首帧/首尾帧或通用多参模板，最后读本集记录与验收。不得只取模板名称；需实际填入本集原镜号、动作、台词、声音及真实引用。风格仅查 [视觉风格](knowledge/visualStyles.md) 的确认条目，计时或衔接有疑问时重读 [镜头知识](knowledge/shotCraft.md) 对应部分。
+准备前读取 [视频模式、模型模板与声音知识](knowledge/videoPromptCraft.md)：先读模式选择和共用约束，再完整读本次实际适用的 Seedance 三段、Wan 单首帧、通用首帧/首尾帧、通用多参或 MiniMax H3 官方格式模板（H3 另须完整读取所选官方指南），最后读本集记录与验收。不得只取模板名称；需实际填入本集原镜号、动作、台词、声音及真实引用。风格仅查 [视觉风格](knowledge/visualStyles.md) 的确认条目，计时或衔接有疑问时重读 [镜头知识](knowledge/shotCraft.md) 对应部分。
 
 ## 一、视频准备
 

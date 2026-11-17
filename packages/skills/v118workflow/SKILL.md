@@ -55,7 +55,7 @@ metadata:
 | 3 | [改编策略](references/adaptationStrategy.md) | 剧本画布：改编原则与边界；确认取舍 |
 | 4 | [逐集剧本](references/episodeScript.md) | 剧本画布：本集完整剧本；默认一集一确认，再决定续写哪集 |
 | 5 | [基础资产提取](references/baseAssets.md) | 资产画布：角色/场景/道具及出场集；确认复用、新建与视觉设定 |
-| 6 | [资产图片制作](references/generateAssets.md) | 资产画布：基础资产提示词与图片；先确认生成方案，再确认采用图片 |
+| 6 | [资产图片制作](references/generateAssets.md) | 资产画布：基础资产提示词与图片；先确认生成方案，再确认采用图片；角色先确认正面定稿图，再生成三视图 |
 | 7 | [导演规划](references/directorPlan.md) | 当前集画布：分场、台词统计、情绪、过渡与注意事项 |
 | 8 | [衍生资产分析](references/deriveAssets.md) | 资产画布：本集衍生清单与父资产；确认全部、部分、调整或跳过 |
 | 9 | [资产图片制作](references/generateAssets.md) | 资产画布：已选衍生图片；无衍生需求时明确记录跳过 |
@@ -74,7 +74,9 @@ metadata:
 | 基础/衍生资产设计与提示词 | [资产设计](references/knowledge/assetDesign.md) + [美术风格](references/knowledge/visualStyles.md) 中所选风格 | 资产画布：角色识别锚点、场景空间与色光、道具结构、变体差异、可执行提示词和采用版本 |
 | 导演规划与分镜 | [镜头设计](references/knowledge/shotCraft.md) + 本项目叙事类型；涉及视觉表达时读取所选美术风格 | 本集画布：镜头意图、信息可见范围、站位视轴、节奏和连续性，落入导演规划及具体镜头 |
 | 分镜图提示词与验收 | [图像提示词](references/knowledge/imagePromptCraft.md) + 所选美术风格 | 本集画布：首帧状态、景别/朝向、实际参考映射、适配模型的提示词与检查结果 |
-| 视频提示词与验收 | [视频提示词](references/knowledge/videoPromptCraft.md) + 所选美术风格的视频表现方法 | 本集画布：按所选模式编写的时序/动作/声音、真实参考绑定、动态连续性与逐段验收 |
+| 视频提示词与验收 | [视频提示词](references/knowledge/videoPromptCraft.md) + 所选美术风格的视频表现方法；选用 MiniMax H3 时另完整读取所选官方指南 [h3PromptBase](references/knowledge/h3PromptBase.md) 或 [h3PromptReference](references/knowledge/h3PromptReference.md)（2026-11-17 加入，非 v1.1.8 原有） | 本集画布：按所选模式编写的时序/动作/声音、真实参考绑定、动态连续性与逐段验收 |
+| 写实人物肤质（可选补充，2026-11-16 加入） | [FOYEGE 皮肤活人感](references/knowledge/foyegeSkinRealism.md)；只在写实风格时读 | 资产 / 分镜图 / 视频提示词中的肤质与受光；服从上方各行知识与所选美术风格 |
+| 人物表演与对白（默认优先参考） | [FOYEGE 对白暗流编排](references/knowledge/foyegeDialogueFlow.md)；涉及人物表演/对白时读取，非对白肢体表演取适用原则，纯环境不硬套 | 剧本阶段可提案确认；把源剧情或已确认设计中的目标/原因 → 触发 → 可见动作/声音 → 对方反应/状态变化，简短自然地落入七列分镜表及最终视频提示词（H3 写进 `integrated_multimodal_description` / `detailed_description` 对应镜头），不只内部分析、不新开字段；不编隐藏动机，不强加结巴、抢话、沉默或微动作 |
 
 叙事类型决定如何组织信息、情绪和镜头，美术风格决定形态、材质、色光和表现方式，两者独立选择，不把“悬疑”当画风或把“黏土”当剧情类型。用户已有明确选择就沿用；未选择时依据内容提出有理由的方案，确认后写入项目配置。
 

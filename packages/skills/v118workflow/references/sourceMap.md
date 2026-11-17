@@ -71,6 +71,7 @@
 | [shotCraft](knowledge/shotCraft.md) | 叙事镜头语法、空间/视轴/动作连续、拆并镜、对白计时、转场和具体审阅 | `data/skills/production_skills/storyboard_table_techniques.md`、导演/表/面板执行技能与 `production_agent_supervision.md` |
 | [imagePromptCraft](knowledge/imagePromptCraft.md) | 景别词库、首帧语义、站位/朝向/反射面、参考绑定、Seedream 与 Nanobanana 提示词模板 | `data/skills/production_skills/storyboard_prompt_techniques.md`、`production_execution_storyboard_panel.md`，结合所选视觉技法 |
 | [videoPromptCraft](knowledge/videoPromptCraft.md) | 首帧、首尾帧、多参模式的动态/镜头/声音/引用结构与模型模板 | `data/modelPrompt/video/` 下通用首尾帧、通用多参、Wan 2.6、Seedance 2 四份文档，结合所选风格 `art_storyboard_video.md` |
+| [h3PromptBase](knowledge/h3PromptBase.md)、[h3PromptReference](knowledge/h3PromptReference.md) | MiniMax H3 官方视频提示词格式（T2VA / I2VA / FL2VA / L2VA / Ref2VA），由 videoPromptCraft 的 H3 模板引用 | 不是 v1.1.8 原有；2026-11-17 用户加入，按 MiniMax 官方指南原文复制 |
 
 实际加载链路也已核对：
 
@@ -95,10 +96,10 @@
 - **保留知识，移除失效的执行控制。** 旧文档“不得加载技能/不得再次读取”的指令，与实际注入的技法库和当前分阶段读取机制有冲突，不继承这些运行时限制。镜头技法中的朝向、视轴等知识映射进七列表的画面描述与运镜，不因旧列被删就连专业内容一起删掉。
 - **按类型解释节奏。** 快节奏单线和商业卡点保留为适用项目的方法；青春的双线/碎片、史诗的群像、家庭的日常、仙侠的诗化留白也保留。数字是旧版经验口径，不替代实际对白、动作时长及用户已确认节奏。
 - **按阶段区分设计知识和自动提取范围。** 场景手册中的天气/角度/破损、道具衍生方法仍可用于用户明确提出的设计；默认制作 SOP 只自动提取角色整体变化和场景时段变化，不据此抹掉其他已存在的设计知识。
-- **共同资产模板与风格差异分开。** 角色四视图是本技能的统一识别资料方案；旧 `3D_guofeng_cyber/art_character.md` 实际是面部超特写模板，不宣称每种旧画风都已有同一四视图。角色的肤色/身高、现代/古代元素按用户已确认身份与世界观，不能被某个 prefix 的例子覆盖。
+- **共同资产模板与风格差异分开。** 角色四视图是本技能的统一识别资料方案，并新增“先确认正面定稿图、再以它为参考生成四视图”的两步做法（旧版为单次生成）；旧 `3D_guofeng_cyber/art_character.md` 实际是面部超特写模板，不宣称每种旧画风都已有同一四视图。角色的肤色/身高、现代/古代元素按用户已确认身份与世界观，不能被某个 prefix 的例子覆盖。
 - **保留国风赛博的场景四方向资料。** 该风格的 `art_prompt/art_scene.md:95–117,150–151` 与 `art_scene_derivative.md:124–129,173–174` 要求同中心点前/右/后/左的 2×2 设定，基础与衍生都适用；其余 10 种画风为单场景图。实际比例服从当前模型，衍生沿用父图视点高度，不把旧衍生文档固定 1.6 米覆盖高空父图；四格仅用于资产资料，不是分镜布局。
 - **提示词模板不等于工具协议。** 图像英文 JSON、视频旧式引用标记属于历史内容模板，转换为当前节点提示词和真实媒体引用；不把模板字段当节点配置，不把旧图片张数、视频时长或“不支持某动作”的假设当作当前模型事实。
-- **模型由真实能力决定。** 旧视频提示词有模型绑定、Wan、Seedance、通用首尾帧和多参分支，并非强制 Seedance；不套入当前其他 workflow 的默认模型。
+- **模型由真实能力决定。** 旧视频提示词有模型绑定、Wan、Seedance、通用首尾帧和多参分支，并非强制 Seedance；不套入当前其他 workflow 的默认模型。MiniMax H3 模板不是 v1.1.8 原有分支，2026-11-17 用户加入，按官方指南编写。
 - **不虚构成片能力。** 旧 README 提及拼接导出，但已核对制作路由不足以证明有对应通用接口；当前只通过实际可用工具合成，或如实交付有序片段及清单。
 
 ## 当前执行契约来源

@@ -1,6 +1,6 @@
 # 视频模式、模型模板与声音知识
 
-用于视频准备与验收。先读取已确认分镜、制作单元及真实参考，再只读本文件中本次适用模板；风格使用 [视觉风格](visualStyles.md) 的当前确认条目，镜头、计时与连续性用 [镜头知识](shotCraft.md)。本文件吸收 v1.1.8 的四份模型提示词，不引入其他 workflow 的 Seedance 路由或默认模型。
+用于视频准备与验收。先读取已确认分镜、制作单元及真实参考，再只读本文件中本次适用模板；风格使用 [视觉风格](visualStyles.md) 的当前确认条目，镜头、计时与连续性用 [镜头知识](shotCraft.md)。本文件吸收 v1.1.8 的四份模型提示词，另加 MiniMax H3 官方格式（非 v1.1.8 原有，2026-11-17 用户加入），不引入其他 workflow 的 Seedance 路由或默认模型。
 
 ## 先选实际输入模式
 
@@ -10,8 +10,9 @@
 | Wan 2.6，实际支持单图首帧 | 下文英文叙事单首帧 | 一个确认镜头及一张首帧 |
 | 已确认首帧/首尾帧，要求连续镜头 | 下文 Visual/Motion/Camera/Audio/Narrative | 一个已确认连续动作单元；本流程首帧路线默认每镜一单元 |
 | 其他实际可用的多参模式 | 下文 References/Instruction | 一个确认片段；真实分镜图可有可无 |
+| MiniMax H3，按真实输入为无参考 / 首帧 / 首尾帧 / 尾帧 / 参考素材 | 下文 MiniMax H3 官方格式（T2VA / I2VA / FL2VA / L2VA / Ref2VA） | 一个确认片段或镜头，4–15 秒 |
 
-这张表是内容模板选择，不是模型兼容性白名单。先查模型支持的媒体类型/数量、模式、时长、分辨率、声音与当前节点配置。未指定模型先确认，不因出现“短剧”就选 Seedance；2.5 或其他版本不能冒称已被 v1.1.8 模板验证。
+这张表是内容模板选择，不是模型兼容性白名单。先查模型支持的媒体类型/数量、模式、时长、分辨率、声音与当前节点配置。未指定模型先确认，不因出现“短剧”就选 Seedance；2.5 或其他版本不能冒称已被 v1.1.8 模板验证；H3 模板按 MiniMax 官方指南，同样不是 v1.1.8 原有。
 
 旧 generateVideoPrompt 路由实际优先级为：数据库已绑定且可读的自定义模型提示词 → 模型名包含 wan 和 2.6 → 名称匹配 Seedance 2.0/2-0 → 首尾帧相关 mode → 字符串数组形式的多参 mode → 通用提示词配置备选。Wan 分支注释写“首尾帧”，实际加载文件和正文都是单图首帧，不能据注释要求尾帧。这些是旧路由事实，当前不访问旧数据库或拼旧 mode 字符串；用户明确选择的模板与当前 schema 优先。
 
@@ -24,7 +25,7 @@
 3. 图像、视频、音频必须是真的媒体输入，不是 URL 字符串、文件名或虚构编号。统一输入序列与供应商分类型请求的映射按 [画布执行](../canvasOperations.md) 核对；无法证明映射时停在待确认，不自行改编号。
 4. 模板出现 {{ref N}} 时只是宿主执行引用占位，编号须回读后填写。旧 @图N / @图片N 不直接照抄；尤其不能沿用旧模板把音频称为“图片”。
 5. 说话者与声音归属明确。普通对白有对应口型；OS/VO 不让画面人物跟着张嘴，听者反应镜也不转移说话人。所有台词保持原语言原字句。
-6. 动作写可见过程、速度和结束状态，情绪通过姿态/视线/呼吸体现；不添加台词、动机、地点、人物或装饰事件。
+6. 人物表演/对白默认优先参考 [FOYEGE 对白暗流编排](foyegeDialogueFlow.md)，非对白肢体表演取适用原则，纯环境不硬套。最终 prompt 的既有动作/叙事段落须简短自然地连写源剧情或已确认设计支持的目标/原因、触发、可见动作/声音及对方反应/状态变化，不只留在内部分析或制作说明，不新开字段、不改变模板。动作仍写可见过程、速度和结束状态；原因不能替代动作，不逐动作附心理解释。不添加台词、隐藏动机、地点、人物或装饰事件，不强加结巴、抢话、沉默或微动作，无依据的环节不补。
 7. 继承已采用场景光照和视觉风格；不根据旧英文示例另造黄昏、冷调、服装或风向。旧模板光影段仅在确认输入确有相应信息时保留。
 8. 默认只用真实环境声、动作声，不自行配乐。画内文字与画外字幕分开；不能为了默认“无文字”删掉剧本中的信件、招牌、屏幕信息或用户明确字幕需求。
 9. 时长在画布配置与台词容量中必须明确，即使所选写作模板不在 prompt 正文写秒数，也不能交给模型随意推断。单元上限为本流程 15 秒与实际模型能力较小者；不兼容则回分镜确认。
@@ -146,6 +147,49 @@ Shot [next original number]: [Next confirmed shot with matching continuity].
 
 旧通用文件同时写“单条分镜不做跨镜”却用跨分镜示例，又在无分镜图时禁止所有引用；迁移保留其参考与正文分离的写法，以本集确认单位与真实输入为准。多镜只在当前模型/模式和已确认分组允许时使用，不能从这个模板推出所有多参模型都支持镜头切换。
 
+## MiniMax H3 官方格式（2026-11-17 用户加入）
+
+非 v1.1.8 原有，按 MiniMax 官方指南。只在本次确认采用 H3 时使用；不把 H3 语法套到其他模型。
+
+### 选模式并完整读取官方指南
+
+| 本单元真实输入 | 模式 | 完整读取 |
+|---|---|---|
+| 无参考媒体 | T2VA | [h3PromptBase.md](h3PromptBase.md) |
+| 仅首帧 | I2VA | 同上 |
+| 首帧 + 尾帧 | FL2VA | 同上 |
+| 仅尾帧 | L2VA | 同上 |
+| 资产图、参考视频或参考音频（可与首尾帧并存） | Ref2VA | [h3PromptReference.md](h3PromptReference.md)；其中指向基础指南的镜头、运镜、说话人、对白规则查 h3PromptBase.md 对应节 |
+
+写之前完整读取所选那份，字段名、顺序、标签和时间写法照官方。首尾帧只在当前模式支持且用户选定时使用。
+
+### 宿主引用映射
+
+- 官方格式中指代真实媒体的 `<Picture N>` / `<Video N>` / `<Audio N>`（含 FL2VA 指令中的 `Picture 1` / `Picture 2`）改写为宿主 `{{ref N}}`，编号按真实输入顺序回读填写（共用约束 3、4 与 [画布执行](../canvasOperations.md)）；`<Subject N>` 是纯文本标签，照官方保留。其余语法照官方。
+- 原因：宿主对图片、视频、音频统一编号，供应商适配在发送前把 `{{ref N}}` 替换成各自标签（如 apiMart → `Image 1` / `Video 1` / `Audio 1`，metaso → `图片1`，首尾帧 → `首帧` / `尾帧`）；直接写 `<Picture N>` 不会被替换，编号也可能错位。
+
+### 模板
+
+~~~text
+For the target video, at 0.00 seconds into the target video, {{ref 1}} (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] [Approved style], [opening composition]... [Shot 2] At 00:04.500, the camera cuts to ...
+
+overall_soundscape: ...
+
+non_diegetic_music: N/A
+~~~
+
+T2VA 没有首行指令；I2VA / FL2VA / L2VA 首行指令照 h3PromptBase.md 2.1 原句，只换成 `{{ref N}}`。Ref2VA 按 h3PromptReference.md 依次写 `subject_definitions` / `summary` / `retention_analysis` / `detailed_description` / `overall_soundscape` / `non_diegetic_music`，资产身份写成 `<Subject 1> is ... in {{ref 1}}`。
+
+### 填写要点
+
+- 字段内容英文；台词、歌词与画内文字保持原语言逐字，台词写在 `<d>[Language] 原句</d>` 内，只出现一次。说话人用 `(S1)` 并全段稳定；VO 用 `says in an off-screen voiceover` 并紧接写明人物嘴唇闭合。
+- `[Shot 1]` 不带时间戳，后续镜头 `[Shot N] At MM:SS.mmm` 严格递增，切点按已确认各镜时长计算，总长等于单元时长；`[Shot N]` 在单元内从 1 编号，原镜号对应关系记在本集说明，不调序、不删镜。
+- 时长 4–15 秒（官方口径），与本流程 15 秒上限一致；低于 4 秒或超过 15 秒的单元返回分镜/模式确认，不加戏凑时长。
+- `overall_soundscape` 只写环境声、动作声和非语言人声，不重复台词；`non_diegetic_music` 默认 `N/A`（共用约束 8），用户明确要求配乐时才写乐器、速度和动态。
+- 不新增官方以外的顶层字段，不另写负面词清单；风格词按官方放在 `[Shot 1]` 或 Ref2VA 开头，其余用具体视觉/声音细节代替 beautiful 等空词。
+
 ## 动作、声音与镜头词汇
 
 镜头术语要精确表达画面，而非盲套旧映射。大远景可用 extreme wide shot，远景 wide shot，全景 full shot，中景 medium shot，近景 medium close-up，特写 close-up，大特写 extreme close-up。近景不能一律翻成面部特写，构图部位有歧义时写清裁切。
@@ -168,4 +212,4 @@ Shot [next original number]: [Next confirmed shot with matching continuity].
 
 验收时看实际媒体的身份、动作/道具接触、人物左右与视线、镜头顺序、对白完整性、声音来源与口型、末尾是否截断，以及前后片段的实际交界状态。逐项写明已查看的证据与问题位置。当前工具无法播放/理解视频或读取音轨时，由用户预览回报，记录“待用户核验”；文件路径与成功状态不能冒充已经看过、听过。用户采用前，成功视频仍是候选。
 
-依据 v1.1.8（cd3e7c4）中 data/modelPrompt/video/seedance2Multi-parameterMode.md、wan2.6Single-imageFirstFrameMode.md、universalFirstAndLastFrameMode.md、universalMulti-parameterMode.md，以及 src/routes/production/workbench/generateVideoPrompt.ts。旧模板描述的语法和效果不是对当前模型的实测承诺。
+依据 v1.1.8（cd3e7c4）中 data/modelPrompt/video/seedance2Multi-parameterMode.md、wan2.6Single-imageFirstFrameMode.md、universalFirstAndLastFrameMode.md、universalMulti-parameterMode.md，以及 src/routes/production/workbench/generateVideoPrompt.ts。旧模板描述的语法和效果不是对当前模型的实测承诺。MiniMax H3 部分依据用户 2026-11-17 提供的官方指南（[h3PromptBase.md](h3PromptBase.md)、[h3PromptReference.md](h3PromptReference.md)）。
