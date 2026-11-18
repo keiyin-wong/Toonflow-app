@@ -7,7 +7,7 @@ import { audioGenerationSchema, imageGenerationSchema, videoGenerationSchema } f
 import { z } from "zod";
 import { error, errorFromCause, success } from "@/lib/responseFormat";
 import conf from "@/utils/conf";
-import { generateMedia, type MediaGenerationCheckpoint } from "@/utils/media/generation";
+import { cancelProviderTask, generateMedia, type MediaGenerationCheckpoint } from "@/utils/media/generation";
 import { resolveWorkspacePath } from "@/utils/workspace/files";
 
 const maxRecordSize = 16 * 1024 * 1024;
@@ -364,6 +364,7 @@ export async function status(cwd: string, taskIds: string[], resume = false) {
 
 export async function cancel(cwd: string, taskIds: string[]) {
   cwd = await realpath(cwd);
+  const remote: { taskId: string; mediaType: NonNullable<TaskRecord["mediaType"]>; request: NonNullable<TaskRecord["request"]>; data: ProviderTaskData }[] = [];
   await Promise.all(taskIds.map(taskId => {
     const key = taskPath(cwd, taskId);
     return locked(key, async () => {
@@ -380,12 +381,23 @@ export async function cancel(cwd: string, taskIds: string[]) {
         if (task.persistenceError) await persist(task);
         return;
       }
+      const { mediaType, request, checkpoint } = task.record;
+      // 已拿到结果地址说明远端已结束，只取消仍在排队或生成中的远端任务。
+      if (mediaType && request && checkpoint.providerData && !checkpoint.assets?.length) {
+        await restoreBlobs(task);
+        remote.push({ taskId, mediaType, request, data: task.record.checkpoint.providerData! });
+      }
       task.record.state = "cancelled";
       task.record.result = error<GeneratedMedia[]>("生成已取消", null, 499);
       // 取消先落盘；包括尚未收到提交的 ID，防止乱序请求稍后创建付费任务。
       await persist(task, exclusive);
     });
   }));
+  // ACT: 提交请求在途时被取消，本地拿不到远端任务 ID，无法撤回；需要宿主允许提交请求不随取消中断才能补上。
+  const results = await Promise.allSettled(remote.map(item => cancelProviderTask(item.mediaType, item.request, item.data)));
+  const failures = results.flatMap((result, index) => result.status === "rejected"
+    ? [`${remote[index]!.taskId}：${result.reason instanceof Error ? result.reason.message : String(result.reason)}`] : []);
+  if (failures.length) invalid(`已停止本地生成，但远端任务取消失败，可能仍在扣费：\n${failures.join("\n")}`, 502);
 }
 
 const cleanupTimer = setInterval(() => {

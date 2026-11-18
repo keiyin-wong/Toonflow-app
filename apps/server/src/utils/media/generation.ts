@@ -214,6 +214,12 @@ export async function getMediaPrice(directory: string | undefined, mediaType: "i
   return getProviderPrice(provider, prepared);
 }
 
+/** 供应商未实现 cancelTask 时不做任何事，远端任务不受影响。 */
+export async function cancelProviderTask(mediaType: "image" | "video" | "audio", request: MediaGenerationRequest, data: ProviderTaskData) {
+  const provider = await configuredProvider(request, mediaType, AbortSignal.timeout(15000), undefined, undefined, true);
+  await provider.cancelTask?.(data);
+}
+
 export async function generateMedia(
   cwd: string,
   mediaType: "image" | "video" | "audio",

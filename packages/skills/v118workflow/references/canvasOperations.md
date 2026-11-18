@@ -37,6 +37,7 @@
 | 剧本、方案、阶段记录 | 文本节点 `node:setText`；通过文本输出回读，不能仅改标签 |
 | 同工作区图片引用 | 图片素材节点 `node:setImage`，传真实工作区 `path` 与匹配的 `mimeType` |
 | 图像/视频提示词 | 对应生成节点 `node:setPrompt` |
+| MiniMax H3 提示词中文对照 | 生成节点旁新建或更新文本节点「<单元名> 中文对照」，`node:setText` 写入并回读；不连接生成节点（相连文本会被追加进 prompt），已有同名节点则更新，不重复新建 |
 | 配置与模型能力 | `node:getConfig`、`node:setConfig`；变更后再次核对配置 |
 | 发起并追踪生成 | 图片 `node:generateImage`、视频 `node:generateVideo`，状态 `node:getGenerationStatus`；只在该节点实际提供时调用 |
 

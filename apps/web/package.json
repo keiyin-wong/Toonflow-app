@@ -36,6 +36,7 @@
     "@toonflow/asr": "workspace:*",
     "@toonflow/assets": "workspace:*",
     "@toonflow/ext-scaffold": "workspace:*",
+    "@toonflow/ffmpeg": "workspace:*",
     "@toonflow/i18n": "workspace:*",
     "@toonflow/model-icons": "workspace:*",
     "@toonflow/node-text": "workspace:*",

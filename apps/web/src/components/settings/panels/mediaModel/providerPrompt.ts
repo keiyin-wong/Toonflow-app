@@ -111,6 +111,7 @@ ComfyUI 接入分支（仅在我的资料或回答涉及 ComfyUI 时使用）
 - generateImage、generateVideo、generateAudio 均返回 Promise<MediaAsset[]>，数组中是最终图片、视频或音频。mediaType 与实际结果一致；type 为 url 时返回 HTTP(S) 地址，为 base64 时返回纯 Base64 数据和正确 MIME，为 binary 时返回 Uint8Array 和正确 MIME。
 - 支持异步查询的供应商可选实现 resumeTask(data): Promise<MediaAsset[]>。在 generateImage、generateVideo、generateAudio 收到远端任务 ID 后，立即 await this.saveTaskData?.(data)，再继续原有轮询；旧生成方法的参数和返回类型保持不变，可选链兼容尚未支持保存任务的旧宿主。同步供应商无需实现这两个能力。
 - data 使用 ProviderTaskData 的 JSON 对象，只保存恢复所需的任务 ID、阶段、模型、地区等非鉴权字段，不保存 API Key、token、请求头、二进制、函数或 AbortSignal。resumeTask 必须验证 data 结构，通过 this.config 重新取得凭据，仅查询原任务并返回最终媒体，不得重新上传或重新提交同一任务。多阶段流程在每次接单后保存新的 data；继续提交下一阶段前先保存明确的提交中状态，响应丢失时恢复应报提交状态未知，不能自动重提。
+- 平台提供取消接口时可选实现 cancelTask(data): Promise<void>，data 与 resumeTask 相同，用户取消时由宿主调用以停止远端任务和扣费；远端已无此任务视为成功，取消被拒时抛错。
 - 供应商明确返回失败、取消、过期等不可恢复终态时，使用 Object.assign(new Error(中文原因), { code: "MEDIA_TASK_FAILED" })；网络中断、查询超时、鉴权暂不可用和未知状态不得标记成远端失败。恢复可重新限定本次等待时长，本地等待超时不代表原任务已失效。
 - 对照模型声明映射公共请求字段。参考素材可能是 URL、Base64 或二进制，由适配器按厂商协议转换；需要上传素材时，也应在适配器内完成。明确校验无法支持的字段，不要悄悄丢掉参考图、首尾帧、参考视频或音频。request.other 只用于厂商专属参数，不允许覆盖鉴权信息或绕过公共字段校验。
 - 没有明确要求时，不添加检查更新、自动升级或其他与模型生成无关的行为。

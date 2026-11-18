@@ -238,6 +238,8 @@ interface ProviderDefinition<TRules extends readonly ProviderFormRule[] = readon
   generateAudio?: GenerateMedia<AudioRequest, ProviderConfig<TRules>>;
   /** 恢复原任务的等待，结果顺序与原 generate 保持一致；不重复提交已接单阶段。明确失败终态可抛出 code 为 MEDIA_TASK_FAILED 的错误。 */
   resumeTask?: (this: ProviderContext<ProviderConfig<TRules>>, data: ProviderTaskData) => Promise<MediaAsset[]>;
+  /** 用户取消时停止远端任务，data 同 resumeTask；远端已无此任务视为成功，取消被拒时抛错。 */
+  cancelTask?: (this: ProviderContext<ProviderConfig<TRules>>, data: ProviderTaskData) => Promise<void>;
   /** 可选的供应商媒体预处理；未实现时保持原请求。 */
   processMedia?: (this: ProviderContext<ProviderConfig<TRules>>, request: ImageRequest | VideoRequest | AudioRequest) => Promise<ImageRequest | VideoRequest | AudioRequest>;
 }

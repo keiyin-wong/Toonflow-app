@@ -51,6 +51,8 @@
 
 生成节点 `prompt` 是本次唯一执行提示词入口，通过 `node:setPrompt({prompt})` 写入。完整剧本和分镜文本节点保留内容依据，不再用 STRING 连线重复挂到生成节点；当前实现会把相连文本全文追加到 prompt。现有无关 STRING 引用在已授权编辑范围内移除，否则说明影响后暂停该生成。
 
+**H3 中文对照节点（2026-11-17 用户加入）。** 目标模型为 MiniMax H3 时，每个视频生成节点写入英文 `prompt` 后，在其旁边（同一行右侧或正下方，不覆盖已有节点）用 `addNode` 新建一个文本节点（类型以 `getCanvas({include:["nodeTypes"]})` 返回为准），标签为「G0N 中文对照」，用 `node:setText` 写入 A9.3.3 的中文翻译并回读核对。**该节点不连接任何生成节点**，否则全文会被追加进 prompt。已存在同名对照节点时更新它，不重复新建；英文 prompt 修改或编号校正后同步更新对照。
+
 当供应商/画布接口实际使用 `{{ref N}}` 作为传输引用时，`{{ref N}}` 只能对应本次真实连接顺序与类型，不能把计划清单顺序当作真实顺序。**这属于执行层映射，不授权把 PART A 已定稿 `Reference binding` 的原始节点/资产句柄改写成另一套用户可见提示词格式。** 目标模型为 MiniMax H3 时，`{{ref N}}` 本身就是 PART A A9.3 定稿格式（代替官方 `<Picture N>` / `<Video N>` / `<Audio N>`）；执行层按下列步骤回读真实顺序后只校正编号，不改其他内容。当前需分批读取现场数据还原顺序，不存在 `getReferences` 工具：
 
 1. 用 `getCanvasEdges({ nodeIds: [目标ID], direction: "incoming" })` 分页读取全部入边，保持返回顺序，筛选实际输入端口的边。用 `getCanvasNodes` 显式指定 `fields: ["ports", "outputs"]` 分批核对源节点，确认源端口存在且类型兼容，从 `outputs[sourceHandle]` 取实际内容，按截断信息补齐必要字段。

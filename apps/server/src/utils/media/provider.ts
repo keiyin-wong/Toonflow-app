@@ -640,5 +640,7 @@ export async function loadMediaProviderSource(source: string, config: Record<str
       }
     } });
   }
+  const { cancelTask } = definition;
+  if (cancelTask) Object.assign(provider, { cancelTask: (data: ProviderTaskData) => cancelTask.call(provider, parseTaskData(data, providerConfig)) });
   return provider;
 }
