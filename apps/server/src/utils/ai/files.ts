@@ -92,6 +92,25 @@ const adapters: FileAdapter[] = [{
   },
 }];
 
+// ACT: 仅在进程内记住不接收视频的「接口地址 + 模型」；重启后首个带视频的请求会再试探一次。
+const videoUnsupportedModels = new Set<string>();
+
+function videoModelKey(apiUrl: string, payload: unknown) {
+  const model = (payload as { model?: unknown } | null | undefined)?.model;
+  return typeof model === "string" ? `${apiUrl}\0${model}` : undefined;
+}
+
+function offloadVideos(payload: unknown) {
+  const videos = getRequestFiles(payload).filter(file => file.mimeType.toLowerCase().startsWith("video/"));
+  for (const video of videos) video.offload("当前模型不接收视频输入，本次未发送视频内容，尚未读取或理解视频画面和声音。");
+  return videos.length > 0;
+}
+
+function offloadKnownVideos(apiUrl: string, payload: unknown) {
+  const key = videoModelKey(apiUrl, payload);
+  if (key && videoUnsupportedModels.has(key)) offloadVideos(payload);
+}
+
 const pendingUploads = new Map<string, { promise: Promise<CachedFile>; signal?: AbortSignal }>();
 const cacheOperations = new Map<string, Promise<unknown>>();
 const invalidatedFiles = new Set<string>();
@@ -142,7 +161,7 @@ export function getUnsupportedFileText(provider: FileProvider, file: { path: str
 
 export function createFileTransport(provider: FileProvider, options: { fetch?: typeof fetch; signal?: AbortSignal } = {}): { prepare(payload: unknown): Promise<void>; fetch: typeof fetch } {
   const fetchRequest = options.fetch ?? globalThis.fetch;
-  const request = Object.assign((input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+  const send = (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
     // 按 Request 接口读取，兼容原生和 Undici 实例；init.signal 覆盖原请求，整轮取消始终保留。
     const inputRequest = typeof input === "object" && "url" in input ? input : undefined;
     const headers = new Headers(init?.headers ?? inputRequest?.headers);
@@ -153,9 +172,28 @@ export function createFileTransport(provider: FileProvider, options: { fetch?: t
     // 工具或用户等待期间代理可能回收 socket，不把它留给下一轮生成或重试。
     headers.set("Connection", "close");
     return fetchRequest(input, { ...init, headers, signal, keepalive: false });
+  };
+  const request = Object.assign(async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    const response = await send(input, init);
+    // ACT: 只处理 SDK 常用的字符串请求体；不接收视频的模型（如部分 MaaS 网关）返回 400 时，把视频改为文字说明后重试一次。
+    if (response.status !== 400 || typeof init?.body !== "string") return response;
+    let body: unknown;
+    try { body = JSON.parse(init.body); } catch { return response; }
+    if (!offloadVideos(body)) return response;
+    const headers = new Headers(init.headers);
+    headers.delete("content-length");
+    const retried = await send(input, { ...init, headers, body: JSON.stringify(body) });
+    if (!retried.ok) {
+      await retried.body?.cancel().catch(() => undefined);
+      return response;
+    }
+    await response.body?.cancel().catch(() => undefined);
+    const key = videoModelKey(provider.apiUrl, body);
+    if (key) videoUnsupportedModels.add(key);
+    return retried;
   }, fetchRequest);
   const adapter = adapters.find(adapter => adapter.accepts(provider));
-  if (!adapter) return { prepare: async () => {}, fetch: request };
+  if (!adapter) return { prepare: async payload => offloadKnownVideos(provider.apiUrl, payload), fetch: request };
   const scope = hash(`${adapter.endpoint}\0${hash(provider.apiKey)}`);
   const directory = join(dirname(conf.path), "ai", "files", scope);
   const preparedFiles = new Map<string, PreparedFile>();
@@ -200,6 +238,7 @@ export function createFileTransport(provider: FileProvider, options: { fetch?: t
 
   async function prepare(payload: unknown) {
     options.signal?.throwIfAborted();
+    offloadKnownVideos(provider.apiUrl, payload);
     const files = getRequestFiles(payload);
     let totalBytes = 0;
     let imageCount = 0;

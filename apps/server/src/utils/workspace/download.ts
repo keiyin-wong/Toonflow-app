@@ -36,7 +36,7 @@ export function remoteAddress(value: string, httpsOnly = false) {
   return url;
 }
 
-function requestFile(url: URL, signal: AbortSignal, accept: string) {
+function requestFile(url: URL, signal: AbortSignal, accept: string, headers: Record<string, string>) {
   return new Promise<IncomingMessage>((resolve, reject) => {
     let outgoing: ClientRequest | undefined;
     let incoming: IncomingMessage | undefined;
@@ -64,8 +64,10 @@ function requestFile(url: URL, signal: AbortSignal, accept: string) {
       const connection = new URL(url);
       connection.hostname = address.family === 6 ? `[${address.address}]` : address.address;
       // ACT: 固定已校验 IP，保留原 Host 和 TLS 证书域名；Bun 的 request signal 不保证及时结束，改为显式销毁并 reject。
+      // 默认 User-Agent：Wikimedia 等站点会对无 UA 请求返回 403，调用方可通过 headers 覆盖。
       outgoing = (url.protocol === "https:" ? requestSecure : request)(connection, {
-        method: "GET", agent: false, servername: hostname, headers: { Host: url.host, Accept: accept },
+        method: "GET", agent: false, servername: hostname,
+        headers: { "User-Agent": "Toonflow/1.0 (+https://github.com/HBAI-Ltd/Toonflow-app)", ...headers, Host: url.host, Accept: accept },
       }, response => {
         incoming = response;
         response.once("close", cleanup);
@@ -79,12 +81,12 @@ function requestFile(url: URL, signal: AbortSignal, accept: string) {
   });
 }
 
-export async function downloadPublicFile(value: string, options: { signal: AbortSignal; maxBytes: number; label: string; httpsOnly?: boolean; accept?: string }) {
-  const { signal, maxBytes, label, httpsOnly = false, accept = "*/*" } = options;
+export async function downloadPublicFile(value: string, options: { signal: AbortSignal; maxBytes: number; label: string; httpsOnly?: boolean; accept?: string; headers?: Record<string, string> }) {
+  const { signal, maxBytes, label, httpsOnly = false, accept = "*/*", headers = {} } = options;
   let url = remoteAddress(value, httpsOnly);
   for (let redirects = 0; redirects <= 5; redirects++) {
     signal.throwIfAborted();
-    const response = await requestFile(url, signal, accept);
+    const response = await requestFile(url, signal, accept, headers);
     if ([301, 302, 303, 307, 308].includes(response.statusCode ?? 0)) {
       const location = response.headers.location;
       response.destroy();
