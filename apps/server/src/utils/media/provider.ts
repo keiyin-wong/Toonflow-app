@@ -1,7 +1,8 @@
 import { t, translateMessage, validationOptions } from "@/lib/i18n";
 
 import { createHash } from "node:crypto";
-import { lstat, mkdir, readFile, readdir, unlink, writeAtomicSync } from "@toonflow/file";
+import { lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, unlink, writeAtomicSync, writeFile } from "@toonflow/file";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { createContext, SourceTextModule } from "node:vm";
 import type { AudioConvertOptions, Provider, ProviderTaskData, ProviderTools } from "@toonflow/providers";
@@ -567,6 +568,71 @@ export async function loadMediaProviderSource(source: string, config: Record<str
       ffmpeg: async () => {
         if (!cwd) throw new Error("当前操作没有工作目录，无法使用 FFmpeg");
         return createWorkspaceFfmpeg(cwd, signal);
+      },
+      exec: async ({ executable, args, inputFiles, readOutputs, timeoutMs, stdin }) => {
+        const command = String(executable ?? "").trim();
+        if (!command) throw Object.assign(new Error("供应商未配置要执行的可执行文件"), { status: 422 });
+        const cliArgs = Array.isArray(args) ? args.map(String) : [];
+        const timeout = AbortSignal.timeout(Number.isFinite(timeoutMs) && (timeoutMs as number) > 0 ? timeoutMs as number : 120_000);
+        const active = signal ? AbortSignal.any([signal, timeout]) : timeout;
+        // 临时目录只由本次 mkdtemp 创建，永不使用请求提供的路径；文件内容是供应商传入的生成素材。
+        const temporaryRoot = await realpath(tmpdir());
+        const directory = await mkdtemp(join(temporaryRoot, "toonflowProviderExec"));
+        try {
+          const paths = await Promise.all((inputFiles ?? []).map(async (file, index) => {
+            if (!(file?.data instanceof Uint8Array) || !file.data.length) throw Object.assign(new Error(`临时输入文件 ${index} 没有内容`), { status: 422 });
+            const name = String(file.name ?? "").trim() || `input${index}`;
+            if (name.includes("/") || name.includes("\\") || name.includes("..")) throw Object.assign(new Error("临时文件名不能包含路径"), { status: 422 });
+            const path = join(directory, name);
+            await writeFile(path, file.data, { flag: "wx", mode: 0o600 });
+            return path;
+          }));
+          const finalArgs = cliArgs.map(arg => {
+            if (arg === "{{dir}}") return directory;
+            const marker = /^\{\{file:(\d+)\}\}$/.exec(arg);
+            if (!marker) return arg;
+            const path = paths[Number(marker[1])];
+            if (!path) throw Object.assign(new Error(`命令参数引用了不存在的临时文件 ${marker[0]}`), { status: 422 });
+            return path;
+          });
+          active.throwIfAborted();
+          const child = Bun.spawn([command, ...finalArgs], {
+            cwd: directory, stdin: stdin === undefined ? "ignore" : "pipe", stdout: "pipe", stderr: "pipe",
+            windowsHide: true, signal: active,
+            env: Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "FFREPORT")),
+          });
+          if (stdin !== undefined) {
+            const input = child.stdin;
+            if (!input) throw Object.assign(new Error("供应商命令的标准输入不可用"), { status: 422 });
+            await input.write(stdin);
+            await input.end();
+          }
+          const decoder = new TextDecoder();
+          const readStream = async (stream: unknown) => {
+            if (!stream || stream === "ignore") return "";
+            let text = "";
+            for await (const chunk of stream as ReadableStream<Uint8Array>) text = (text + decoder.decode(chunk, { stream: true })).slice(-400_000);
+            return text + decoder.decode();
+          };
+          const [stdout, stderr, exitCode] = await Promise.all([readStream(child.stdout), readStream(child.stderr), child.exited]);
+          if (timeout.aborted && !signal?.aborted) throw Object.assign(new Error(`执行 ${command} 超时`), { status: 504 });
+          signal?.throwIfAborted();
+          let outputs: { name: string; data: Uint8Array }[] | undefined;
+          if (readOutputs) {
+            const inputNames = new Set((inputFiles ?? []).map(file => String(file.name ?? "").trim()));
+            outputs = [];
+            for (const entry of await readdir(directory)) {
+              if (inputNames.has(entry)) continue;
+              const path = join(directory, entry);
+              if (!(await lstat(path)).isFile()) continue;
+              outputs.push({ name: entry, data: await readFile(path) });
+            }
+          }
+          return { exitCode: exitCode ?? -1, stdout, stderr, outputs };
+        } finally {
+          if (dirname(directory) !== temporaryRoot) throw new Error("供应商命令临时目录超出系统临时目录，已停止清理");
+          await rm(directory, { recursive: true, force: true });
+        }
       },
     } satisfies ProviderTools,
   };

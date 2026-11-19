@@ -114,6 +114,26 @@ interface ProviderTools {
    * @example const ffmpeg = await this.tool.ffmpeg(); const command = ffmpeg("assets/input.mp4").videoCodec("libx264");
    */
   ffmpeg(): Promise<import("@toonflow/ffmpeg/types").FfmpegFactory>;
+  /**
+   * 在宿主侧执行外部命令行程序，供基于本地 CLI 的供应商使用；与 FFmpeg 同级信任面。
+   * inputFiles 由宿主写入私有临时目录并在结束后清理；args 中的 {{file:N}} 占位符替换为对应文件的真实路径，
+   * {{dir}} 替换为临时目录本身；readOutputs 为 true 时读回临时目录中的新增文件（不含 inputFiles）。
+   * @param request.executable 可执行文件；建议填绝对路径，Windows 下需含 .exe 后缀
+   * @param request.args 命令参数；支持 {{file:N}} 与 {{dir}} 占位符
+   * @param request.inputFiles 宿主代写的输入文件，写入临时目录
+   * @param request.readOutputs 执行后读回临时目录中的新增文件，随 outputs 返回
+   * @param request.timeoutMs 超时毫秒数，缺省 120000；超时终止进程并抛出 504 错误
+   * @returns 退出码与 stdout/stderr（超长输出仅保留尾部）；readOutputs 时附带 outputs 文件
+   * @example const result = await this.tool.exec({ executable: "C:/bin/tool.exe", args: ["run", "{{file:0}}", "--out", "{{dir}}"], inputFiles: [{ data: bytes, name: "ref.png" }], readOutputs: true });
+   */
+  exec(request: {
+    executable: string;
+    args: string[];
+    inputFiles?: { data: Uint8Array; name: string }[];
+    readOutputs?: boolean;
+    timeoutMs?: number;
+    stdin?: string;
+  }): Promise<{ exitCode: number; stdout: string; stderr: string; outputs?: { name: string; data: Uint8Array }[] }>;
 }
 
 interface ImageRequest extends MediaRequest {
