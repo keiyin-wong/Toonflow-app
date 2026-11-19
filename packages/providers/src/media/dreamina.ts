@@ -33,8 +33,6 @@ const rules = [
   },
 ] as const;
 
-const version = "1.0.0";
-
 type ReferencedImageRequest = ImageRequest & {
   referenceOrder?: ({ type: "image"; index: number } | { type: "text" })[];
 };
@@ -383,30 +381,25 @@ function videoRefsAndPrompt(request: ReferencedVideoRequest, cliMode: "t2v" | "m
   return { prompt, refs };
 }
 
-const imageRatiosCommon = ["1:1", "3:4", "16:9", "4:3", "9:16", "2:3", "3:2", "21:9"];
-const videoRatiosCommon = ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"];
-
 export default {
   id: "dreamina",
   label: "即梦 Dreamina",
-  version,
-  readme: [
-    "## 即梦 Dreamina（本地 CLI）",
-    "",
-    "通过 [Dreamina Canvas CLI](https://dreamina.capcut.com/canvas-cli/install.ps1) 使用即梦的图片与视频模型，生成与计价使用你自己的即梦账号积分。",
-    "",
-    "### 准备",
-    "",
-    "1. 安装 CLI：Windows PowerShell 执行 `irm https://dreamina.capcut.com/canvas-cli/install.ps1 | iex`；",
-    "2. 登录：终端执行 `dreamina-canvas auth login`，浏览器完成授权；",
-    "3. 在本供应商设置里确认「CLI 路径」。Windows 下若 PATH 未生效，请填完整路径（如 `C:/Users/<用户>/bin/dreamina-canvas.exe`）。",
-    "",
-    "### 说明",
-    "",
-    "- 估价：改参数时按当前模型与档位显示预计积分（Dreamina 官方报价，不生成、不扣费）；",
-    "- 生成：真实扣积分，超过「单次生成积分上限」会自动停止并提示；",
-    "- 生成结果同时会保存在 Dreamina 的桥接画布（可在即梦网页端查看与继续编辑）。",
-  ].join("\n"),
+  version: "1.0.0",
+  readme: `## 即梦 Dreamina（本地 CLI）
+
+通过 [Dreamina Canvas CLI](https://dreamina.capcut.com/canvas-cli/install.ps1) 使用即梦的图片与视频模型，生成与计价使用你自己的即梦账号积分。
+
+### 准备
+
+1. 安装 CLI：Windows PowerShell 执行 \`irm https://dreamina.capcut.com/canvas-cli/install.ps1 | iex\`；
+2. 登录：终端执行 \`dreamina-canvas auth login\`，浏览器完成授权；
+3. 在本供应商设置里确认「CLI 路径」。Windows 下若 PATH 未生效，请填完整路径（如 \`C:/Users/<用户>/bin/dreamina-canvas.exe\`）。
+
+### 说明
+
+- 估价：改参数时按当前模型与档位显示预计积分（Dreamina 官方报价，不生成、不扣费）；
+- 生成：真实扣积分，超过「单次生成积分上限」会自动停止并提示；
+- 生成结果同时会保存在 Dreamina 的桥接画布（可在即梦网页端查看与继续编辑）。`,
   rules,
   models: [
     {
@@ -414,7 +407,7 @@ export default {
       label: "Seedream 5.5",
       type: "image",
       mode: ["text", "singleImage", "multiReference"],
-      imageRatios: imageRatiosCommon,
+      imageRatios: ["1:1", "3:4", "16:9", "4:3", "9:16", "2:3", "3:2", "21:9"],
       imageSizes: ["1.5K", "2K"],
     },
     {
@@ -430,7 +423,7 @@ export default {
       label: "Seedream 4.0",
       type: "image",
       mode: ["text", "singleImage", "multiReference"],
-      imageRatios: imageRatiosCommon,
+      imageRatios: ["1:1", "3:4", "16:9", "4:3", "9:16", "2:3", "3:2", "21:9"],
       imageSizes: ["2K", "4K"],
     },
     {
@@ -438,7 +431,7 @@ export default {
       label: "Nano Banana Pro",
       type: "image",
       mode: ["text", "singleImage", "multiReference"],
-      imageRatios: imageRatiosCommon,
+      imageRatios: ["1:1", "3:4", "16:9", "4:3", "9:16", "2:3", "3:2", "21:9"],
       imageSizes: ["1K", "2K", "4K"],
     },
     {
@@ -446,7 +439,7 @@ export default {
       label: "Nano Banana 2.1",
       type: "image",
       mode: ["text", "singleImage", "multiReference"],
-      imageRatios: imageRatiosCommon,
+      imageRatios: ["1:1", "3:4", "16:9", "4:3", "9:16", "2:3", "3:2", "21:9"],
       imageSizes: ["1K", "2K", "4K"],
     },
     {
@@ -471,7 +464,7 @@ export default {
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:30", "videoReference:10", "audioReference:10"]],
       durationResolutionMap: [{ duration: [5], resolution: ["480p", "720p", "1080p", "4k"] }],
-      imageRatios: videoRatiosCommon,
+      imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
       id: "seedance_2.5_flash",
@@ -479,7 +472,7 @@ export default {
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:10", "videoReference:5", "audioReference:5"]],
       durationResolutionMap: [{ duration: [5], resolution: ["480p", "720p"] }],
-      imageRatios: videoRatiosCommon,
+      imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
       id: "seedance_2.0",
@@ -487,7 +480,7 @@ export default {
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:9", "videoReference:3", "audioReference:3"]],
       durationResolutionMap: [{ duration: [5], resolution: ["720p", "1080p", "4K"] }],
-      imageRatios: videoRatiosCommon,
+      imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
       id: "seedance_2.0_fast",
@@ -495,7 +488,7 @@ export default {
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:9", "videoReference:3", "audioReference:3"]],
       durationResolutionMap: [{ duration: [5], resolution: ["720p"] }],
-      imageRatios: videoRatiosCommon,
+      imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
       id: "veo_3.1",
