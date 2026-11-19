@@ -140,7 +140,8 @@ async function bytesOf(context: ProviderContext, input: MediaInput): Promise<{ d
 
 interface BridgeCanvas { projectId: string; cliPath: string; }
 let bridgeCache: BridgeCanvas | undefined;
-let placeholderCache: { key: string; resourceId: string } | undefined;
+// CLI 拒绝重复的 ref 值，多参考图估价需逐个不同的占位资源；按索引缓存复用。
+const placeholderCache = new Map<string, string[]>();
 
 let quoteQueueTail: Promise<unknown> = Promise.resolve();
 
@@ -172,17 +173,20 @@ const placeholderPng = Uint8Array.from(
   Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64"),
 );
 
-async function placeholderResource(context: ProviderContext, projectId: string): Promise<string> {
+async function placeholderResources(context: ProviderContext, projectId: string, count: number): Promise<string[]> {
   const { cliPath } = cfg(context);
   const key = `${cliPath}@${projectId}`;
-  if (placeholderCache?.key === key) return placeholderCache.resourceId;
-  const uploaded = await cli<{ resourceId?: string }>(context, [
-    "resource", "upload", "--file", "{{file:0}}", "--name", "toonflow-quote-placeholder", "--project-id", projectId, "--format", "json",
-  ], { inputFiles: [{ data: placeholderPng, name: "placeholder.png" }] });
-  const resourceId = uploaded.resourceId;
-  if (!resourceId) throw Object.assign(new Error("Dreamina 占位资源上传失败"), { code: "MEDIA_TASK_FAILED" });
-  placeholderCache = { key, resourceId };
-  return resourceId;
+  const cached = placeholderCache.get(key) ?? [];
+  while (cached.length < count) {
+    const uploaded = await cli<{ resourceId?: string }>(context, [
+      "resource", "upload", "--file", "{{file:0}}", "--name", `toonflow-quote-placeholder-${cached.length + 1}`, "--project-id", projectId, "--format", "json",
+    ], { inputFiles: [{ data: placeholderPng, name: "placeholder.png" }] });
+    const resourceId = uploaded.resourceId;
+    if (!resourceId) throw Object.assign(new Error("Dreamina 占位资源上传失败"), { code: "MEDIA_TASK_FAILED" });
+    cached.push(resourceId);
+  }
+  placeholderCache.set(key, cached);
+  return cached.slice(0, count);
 }
 
 async function uploadMedia(context: ProviderContext, input: MediaInput, projectId: string, name: string): Promise<string> {
@@ -245,8 +249,7 @@ async function quoteParams(context: ProviderContext, kind: "image" | "video", pa
     ]);
     let refs: string[] = [];
     if (params.referenceCount > 0) {
-      const placeholder = await placeholderResource(context, projectId);
-      refs = Array.from({ length: params.referenceCount }, () => `res:${placeholder}`);
+      refs = (await placeholderResources(context, projectId, params.referenceCount)).map(id => `res:${id}`);
     }
     const generationArgs = buildGenerationArgs(kind, { ...params, refs });
     let nodeId = found.items?.[0]?.nodeId;
@@ -267,12 +270,22 @@ interface OperationStatus { state?: string; resources?: { resourceId?: string }[
 
 async function pollAndDownload(context: ProviderContext, projectId: string, submitId: string, mediaType: "image" | "video"): Promise<MediaAsset[]> {
   const deadline = Date.now() + 60 * 60_000;
+  // 轮询期间的瞬时网络错误不终止等待中的任务；连续失败超过该次数才放弃。
+  let transientFailures = 0;
   while (true) {
     context.signal?.throwIfAborted();
     if (Date.now() > deadline) throw Object.assign(new Error("Dreamina 生成超时（60 分钟）"), { code: "MEDIA_TASK_FAILED" });
-    const status = await cli<OperationStatus>(context, [
-      "operation", "status", submitId, "--project-id", projectId, "--format", "json",
-    ], { timeoutMs: 60_000 });
+    let status: OperationStatus;
+    try {
+      status = await cli<OperationStatus>(context, [
+        "operation", "status", submitId, "--project-id", projectId, "--format", "json",
+      ], { timeoutMs: 60_000 });
+      transientFailures = 0;
+    } catch (error) {
+      if (++transientFailures > 6) throw error;
+      await wait(context, 10_000);
+      continue;
+    }
     const state = String(status.state ?? "");
     if (state === "succeeded" || state === "partial_success") {
       const resourceIds = (status.resources ?? []).map(item => item.resourceId).filter((id): id is string => !!id);
