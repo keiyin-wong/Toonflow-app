@@ -16,13 +16,15 @@ const app = await createApp({
   toolsRoot: resolve(appDirectory, "build/tools"),
   nodesRoot: resolve(appDirectory, "build/nodes"),
   extRoot: resolve(appDirectory, "build/ext"),
+  providersRoot: resolve(appDirectory, fromSource ? "packages/providers/src" : "build/providers"),
   // ACT: 暂不安装内置团队，随团队打包一同恢复。
   // agentsRoot: resolve(appDirectory, "build/agents"),
-  providersRoot: resolve(appDirectory, fromSource ? "packages/providers/src" : "build/providers"),
   skillsRoot: resolve(appDirectory, fromSource ? "packages/skills" : "build/skills"),
 });
 const { initializeMcpRuntime } = await import("./utils/mcp/runtime");
 const { startMobileLinkRuntime } = await import("./utils/mobileLink");
+const { startMultiTenantRuntime } = await import("./utils/multiTenant");
+await startMultiTenantRuntime(app);
 app.listen(realPort, async (error?: Error) => {
   if (error) throw error;
   await initializeMcpRuntime(app, `http://127.0.0.1:${realPort}`, resolve(appDirectory, fromSource ? "packages/mcp/src/stdio.ts" : "build/mcp/stdio.js"));

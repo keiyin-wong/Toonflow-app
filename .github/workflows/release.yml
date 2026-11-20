@@ -35,6 +35,8 @@ jobs:
     secrets:
       MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
       MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_INSTALLER_CERTIFICATE_BASE64: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_BASE64 }}
+      MACOS_INSTALLER_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
       MACOS_NOTARIZATION_KEY_ID: ${{ secrets.MACOS_NOTARIZATION_KEY_ID }}
       MACOS_NOTARIZATION_ISSUER_ID: ${{ secrets.MACOS_NOTARIZATION_ISSUER_ID }}
       MACOS_NOTARIZATION_KEY_BASE64: ${{ secrets.MACOS_NOTARIZATION_KEY_BASE64 }}
@@ -91,9 +93,12 @@ jobs:
             if (names.length !== 1) throw new Error(`${label} 安装包数量应为 1，实际为 ${names.length}`);
             return names[0];
           };
-          const windows = findInstaller("Windows", name => name === `toonflow-${version}-Setup.exe`);
-          const macArm = findInstaller("macOS ARM64", name => name.endsWith(".dmg") && name.includes("arm64"));
-          const macIntel = findInstaller("macOS x64", name => name.endsWith(".dmg") && name.includes("x64"));
+          const windows = findInstaller("Windows x64", name => name === `toonflow-${version}-Setup.exe`);
+          const windowsArm = findInstaller("Windows ARM64", name => name === `toonflow-${version}-win-arm64-Setup.exe`);
+          const macArm = findInstaller("macOS ARM64", name => name === `toonflow-${version}-macos-arm64.pkg`);
+          const macIntel = findInstaller("macOS x64", name => name === `toonflow-${version}-macos-x64.pkg`);
+          const linux = findInstaller("Linux x64", name => name === `toonflow-${version}-linux-x64.deb`);
+          const linuxArm = findInstaller("Linux ARM64", name => name === `toonflow-${version}-linux-arm64.deb`);
           const android = findInstaller("Android ARM64", name => name === `toonflow-${version}-android-arm64.apk`);
           const baseUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}`;
           const download = name => `${baseUrl}/${encodeURIComponent(name)}`;
@@ -104,20 +109,25 @@ jobs:
             "",
             "| 你的设备 | 下载 |",
             "| --- | --- |",
-            `| 💻 Windows（64 位） | [⬇️ 下载 Windows 安装包](${download(windows)}) |`,
+            `| 💻 Windows（Intel / AMD，x64） | [⬇️ 下载 Windows x64 安装包](${download(windows)}) |`,
+            `| 💻 Windows（ARM64） | [⬇️ 下载 Windows ARM64 安装包](${download(windowsArm)}) |`,
             `| 🍎 Mac（M 系列芯片） | [⬇️ 下载 M 系列 Mac 安装包](${download(macArm)}) |`,
             `| 🍎 Mac（Intel 芯片） | [⬇️ 下载 Intel Mac 安装包](${download(macIntel)}) |`,
+            `| 🐧 Linux（Intel / AMD，x64） | [⬇️ 下载 Linux x64 DEB](${download(linux)}) |`,
+            `| 🐧 Linux（ARM64） | [⬇️ 下载 Linux ARM64 DEB](${download(linuxArm)}) |`,
             `| 📱 Android（ARM64，Android 8 及以上） | [⬇️ 下载 Android APK](${download(android)}) |`,
             "",
             "> 💡 手动安装请选择上表中的链接。下方其他文件供软件自动更新使用。",
             "",
             "## 🚀 安装说明",
             "",
-            "- 💻 **Windows**：双击下载的安装包，按提示完成安装。",
-            "- 🍎 **Mac**：打开下载的安装包，将 `toonflow.app` 拖入“应用程序”，再从“应用程序”打开。",
+            "- 💻 **Windows**：双击下载的安装包，按提示完成安装。ARM64 需要 .NET Framework 4.8.1，较新的 Windows 11 已内置。",
+            "- 🍎 **Mac（macOS 14 及以上）**：双击下载的 `.pkg`，按提示继续安装；安装期间会自动下载并准备必要运行时，完成后从“应用程序”打开 Toonflow。",
+            "- 🐧 **Linux（Debian / Ubuntu）**：选择对应架构的 DEB，在下载目录执行 `sudo apt install ./toonflow-版本号-linux-架构.deb`。安装后可在「设置 → 关于」更新；使用 2.0.10 的用户需先手动覆盖安装一次。",
             "- 📱 **Android**：在手机上打开 APK，按系统提示允许此来源安装应用。后续版本可直接覆盖安装。",
             "",
-            "M 系列 Mac 安装包已完成 Developer ID 签名与 Apple 公证。首次打开时，macOS 仍可能提示确认打开从互联网下载的应用。",
+            "两种 Mac 应用使用 Developer ID Application 签名，PKG 安装包使用 Developer ID Installer 签名，并完成 Apple 公证。首次打开时，macOS 仍可能提示确认打开从互联网下载的应用。",
+            "旧版 Intel Mac 客户端首次迁移到统一 SDK 版本时，请下载完整 PKG 覆盖安装；旧版增量更新不能直接迁移。安装前请退出应用并备份原数据目录。",
             "",
             "---",
             "",
@@ -170,12 +180,20 @@ jobs:
           // ACT: Android APK 随 GitHub Release 发布，现有更新托管接口仅登记桌面版本。
           const names = readdirSync("artifacts", { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => entry.name)
             .filter(name => name !== `toonflow-${version}-android-arm64.apk`);
-          const targets = [{ platform: "win", arch: "x64" }, { platform: "macos", arch: "arm64" }, { platform: "macos", arch: "x64" }];
+          const targets = [
+            { platform: "win", arch: "x64" },
+            { platform: "win", arch: "arm64" },
+            { platform: "macos", arch: "arm64" },
+            { platform: "macos", arch: "x64" },
+            { platform: "linux", arch: "x64" },
+            { platform: "linux", arch: "arm64" },
+          ];
           const plans = await Promise.all(targets.map(async target => {
             const prefix = `stable-${target.platform}-${target.arch}-`;
             const installers = names.filter(name => target.platform === "win"
-              ? name === `toonflow-${version}-Setup.exe`
-              : name.endsWith(".dmg") && name.includes(target.arch));
+              ? name === (target.arch === "x64" ? `toonflow-${version}-Setup.exe` : `toonflow-${version}-win-arm64-Setup.exe`)
+              : target.platform === "linux" ? name === `toonflow-${version}-linux-${target.arch}.deb`
+              : name === `toonflow-${version}-macos-${target.arch}.pkg`);
             if (installers.length !== 1) throw new Error(`${prefix}安装包数量应为 1，实际为 ${installers.length}`);
             const manifestName = `${prefix}update.json`;
             if (!names.includes(manifestName)) throw new Error(`缺少更新清单：${manifestName}`);
@@ -183,9 +201,7 @@ jobs:
             if (manifest?.version !== version || manifest.platform !== target.platform || manifest.arch !== target.arch) {
               throw new Error(`${manifestName} 的版本、平台或架构不匹配`);
             }
-            // ACT: Intel Mac 保留旧清单协议，归档名与现有发布脚本一致。
-            const archiveName = manifest.artifact === undefined && target.platform === "macos" && target.arch === "x64"
-              ? `${prefix}toonflow.app.tar.zst` : manifest.artifact?.file;
+            const archiveName = manifest.artifact?.file;
             if (typeof archiveName !== "string" || !archiveName.startsWith(prefix) || !archiveName.endsWith(".tar.zst") || !names.includes(archiveName)) {
               throw new Error(`${manifestName} 引用的完整更新包不存在`);
             }
@@ -193,7 +209,11 @@ jobs:
             for (const name of fileNames) {
               if (!Bun.file(join("artifacts", name)).size) throw new Error(`构建产物为空：${name}`);
             }
-            return { ...target, fileNames };
+            if (target.platform === "linux" && (manifest.deb?.file !== installers[0] || !/^[a-zA-Z0-9]+$/.test(manifest.hash))) {
+              throw new Error(`${manifestName} 的 Debian 安装包或构建号无效`);
+            }
+            const debAlias = target.platform === "linux" ? `${prefix}${manifest.hash}.deb` : undefined;
+            return { ...target, fileNames, debAlias };
           }));
           const plannedNames = new Set(plans.flatMap(plan => plan.fileNames));
           if (names.some(name => !plannedNames.has(name))) throw new Error("存在无法归属到发布平台的构建产物");
@@ -216,7 +236,7 @@ jobs:
           }
 
           const uploadedPaths = new Set<string>();
-          // ACT: 最多三个平台并行，各平台内串行，避免大文件阻塞其他平台。
+          // ACT: 各平台并行、平台内串行，避免大文件阻塞其他平台。
           const platforms = await Promise.all(plans.map(async plan => {
             const uploadedFiles = [];
             for (const fileName of plan.fileNames) {
@@ -260,6 +280,8 @@ jobs:
               console.log(`已上传 ${fileName}（${file.size} 字节）`);
             }
             const [application, ...files] = uploadedFiles;
+            // 官网更新路由只查带渠道及架构前缀的 files；别名复用安装包对象，不重复上传。
+            if (plan.debAlias) files.push({ ...application!, fileName: plan.debAlias });
             return { platform: plan.platform, arch: plan.arch, applicationPath: application!.fileUrl, files };
           })).catch(error => {
             uploadController.abort();

@@ -53,7 +53,8 @@
         </div>
         <promptInput v-model="data.promptModel" v-model:text="data.prompt" :references="referenceMentions" :materials="materialMentions" :selectMaterial="selectMaterialReference" :selectAsset="selectAssetReference" expandable />
         <div class="promptFooter">
-          <el-select
+          <modelSelect
+            :empty="!models.length"
             :modelValue="selectedModel ? data.model : ''"
             class="modelSelect"
             filterable
@@ -63,8 +64,8 @@
             aria-label="生成模型"
             noDataText="请先在设置中添加视频模型"
             placement="top-start"
-            @update:modelValue="data.model = $event"
-            @visible-change="(visible) => visible && loadModels().catch((error) => showNodeError(error, '模型读取失败'))">
+            @update:modelValue="selectModel"
+            @visibleChange="(visible: boolean) => visible && loadModels().catch((error) => showNodeError(error, '模型读取失败'))">
             <template v-if="!selectedModel" #prefix><icon-sparkles :size="17" /></template>
             <template #label="{ label }"><modelLabel :label="label" :providerId="selectedModel?.providerId" :modelId="selectedModel?.modelId" /></template>
             <el-option-group v-for="provider in modelGroups" :key="provider.id" :label="provider.label">
@@ -72,11 +73,11 @@
                 v-for="item in provider.models"
                 :key="item.modelId"
                 :label="item.label"
-                :value="JSON.stringify([item.providerId, item.modelId])">
+                :value="getNodeModelKey(item)">
                 <modelLabel :label="item.label" :providerId="item.providerId" :modelId="item.modelId" />
               </el-option>
             </el-option-group>
-          </el-select>
+          </modelSelect>
           <generationSettings
             v-model:duration="data.duration"
             v-model:resolution="data.resolution"
@@ -89,7 +90,6 @@
             :disabled="generating || deleting || !selectedModel" />
           <div class="generationActions">
             <mediaPrice v-if="generationInput" :input="{ ...generationInput, mediaType: 'video' }" :supported="selectedModel?.supportsPrice === true" />
-            <el-button v-if="pendingRecovery" class="sendButton" :icon="IconPlayerStop" :loading="cancelling" :disabled="deleting || uploading" title="放弃任务" aria-label="放弃任务" @click="generationState.cancel().catch(error => showNodeError(error, '停止生成失败'))" />
             <el-button
               class="sendButton"
               :icon="generating ? IconPlayerStop : IconArrowUp"
@@ -107,14 +107,15 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onScopeDispose, ref, shallowRef, watch } from "vue";
-import { ElButton, ElCard, ElSelect, ElOption, ElOptionGroup, ElLoading, ElDropdown, ElDropdownMenu, ElDropdownItem } from "element-plus";
+import { ElButton, ElCard, ElOption, ElOptionGroup, ElLoading, ElDropdown, ElDropdownMenu, ElDropdownItem } from "element-plus";
 import { IconCameraAi, IconSparkles, IconArrowUp, IconPlayerStop, IconTransfer, IconMusic, IconLayersSubtract, IconScissors, IconMovie, IconPhotoScan, IconPlayerSkipBack, IconPlayerSkipForward } from "@tabler/icons-vue";
-import { nodeSkeleton, nodeTools, useNode, z, type NodeMediaModel, type NodeVideoRequest, type NodeHandle } from "@toonflow/nodes-scaffold/runtime";
+import { findNodeModel, getNodeModelIdentity, getNodeModelKey, nodeSkeleton, nodeTools, useNode, useNodeModelMemory, useNodeModelSelection, z, type NodeMediaModel, type NodeVideoRequest, type NodeHandle } from "@toonflow/nodes-scaffold/runtime";
 import { groupNodeModels } from "@toonflow/node-shared/groupNodeModels";
 import modelLabel from "@toonflow/node-shared/modelLabel";
+import modelSelect from "@toonflow/node-shared/modelSelect";
 import { showNodeError } from "@toonflow/node-shared/showNodeError";
 import { useNodeGeneration } from "@toonflow/node-shared/useNodeGeneration";
-import { useModelForm } from "@toonflow/node-shared/useModelForm";
+import { getModelFormValues, useModelForm } from "@toonflow/node-shared/useModelForm";
 import { useNodeReferences } from "@toonflow/node-shared/useNodeReferences";
 import { getPromptText } from "@toonflow/node-shared/promptText";
 import promptInput from "@toonflow/node-shared/promptInput";
@@ -137,6 +138,7 @@ defineOptions({
 const vLoading = ElLoading.directive;
 const { id, node, nodeProps, nodeEvent, outputs, files, ai, updateNodeInternals } = useNode({
   label: "视频生成",
+  onModelsChanged: () => void refreshProviderModels(),
 });
 type PromptModel = NonNullable<InstanceType<typeof promptInput>["$props"]["modelValue"]>;
 const data = computed(() => node.data as { prompt: string; promptModel: PromptModel; model: string; duration?: number; resolution: string; ratio: string; mode: string; generateAudio: boolean; other: Record<string, unknown> });
@@ -166,7 +168,8 @@ let modelsRequest: Promise<void> | undefined;
 watch(generating, value => { if (!value && !disposed && !deleting.value && !models.value.length) void loadModels().catch(error => showNodeError(error, "模型读取失败")); });
 // ACT: 供应商未声明视频比例范围，沿用界面的通用比例，具体支持范围由供应商校验。
 const ratioOptions = ["16:9", "9:16", "1:1", "4:3", "3:4"];
-const selectedModel = computed(() => models.value.find((item) => JSON.stringify([item.providerId, item.modelId]) === data.value.model));
+const selectedModel = useNodeModelSelection(models, computed({ get: () => data.value.model, set: value => { data.value.model = value; } }));
+const modelMemory = useNodeModelMemory("video");
 useModelForm(data, selectedModel);
 const selectedMode = computed(() => selectedModel.value?.mode?.find((item) => JSON.stringify(item) === data.value.mode) as NodeVideoRequest["mode"]);
 const frameMode = computed(() => ["startEndRequired", "endFrameOptional", "startFrameOptional"].includes(String(selectedMode.value)));
@@ -256,8 +259,7 @@ function getGenerationInput(prompt: string): Omit<NodeVideoRequest, "directory">
   const firstFrame = frameMode.value && (selectedMode.value !== "startFrameOptional" || images.length > 1) ? images[0] : undefined;
   const lastFrame = frameMode.value ? images[selectedMode.value === "startFrameOptional" && images.length === 1 ? 0 : 1] : undefined;
   return {
-    providerId: choice.providerId,
-    modelId: choice.modelId,
+    ...getNodeModelIdentity(choice),
     prompt: getGenerationPrompt(prompt, references),
     mode: selectedMode.value,
     duration: data.value.duration,
@@ -293,8 +295,8 @@ onScopeDispose(() => {
   generationController?.abort();
 });
 
-async function refreshProviderModels(event: Event) {
-  if (event.type === "toonflow:plugin-installed" && (event as CustomEvent<{ type?: string }>).detail?.type !== "provider") return;
+async function refreshProviderModels(event?: Event) {
+  if (event?.type === "toonflow:plugin-installed" && (event as CustomEvent<{ type?: string }>).detail?.type !== "provider") return;
   try {
     await generation;
     if (!disposed && !deleting.value) await loadModels();
@@ -334,16 +336,21 @@ function loadModels() {
   modelsRequest = ai.getMediaModels().then((items) => {
     if (disposed || generating.value || deleting.value) return;
     models.value = items.filter((item) => item.type === "video");
-    // ACT: 只给空配置选默认模型，保留暂时不可用的旧选择及其参数。
+    // ACT: 只给空配置选默认模型（优先上次手动选择的），保留暂时不可用的旧选择及其参数。
     if (!data.value.model) {
-      const first = modelGroups.value[0]?.models[0];
-      data.value.model = first ? JSON.stringify([first.providerId, first.modelId]) : "";
+      const choice = findNodeModel(models.value, modelMemory.get()) ?? modelGroups.value[0]?.models[0];
+      data.value.model = choice ? getNodeModelKey(choice) : "";
     }
   }).finally(() => {
     modelsLoading.value = false;
     modelsRequest = undefined;
   });
   return modelsRequest;
+}
+
+function selectModel(value: string) {
+  data.value.model = value;
+  if (value) modelMemory.set(value);
 }
 
 async function startGeneration() {
@@ -437,7 +444,7 @@ function getConfig() {
 
 nodeTools.register({
   name: "getConfig",
-  description: "读取此视频生成节点的当前配置、可选视频模型能力、通用比例及适合当前引用的模式，不含密钥；时长与分辨率须符合 durationResolutionMap",
+  description: "读取此视频生成节点的当前配置、自定义配置 other、可选视频模型能力、通用比例及适合当前引用的模式，models 中的 rules 声明自定义字段，不含密钥；时长与分辨率须符合 durationResolutionMap",
   parameters: z.strictObject({}),
   async execute(_args, { signal }) {
     signal?.throwIfAborted();
@@ -449,7 +456,7 @@ nodeTools.register({
 
 nodeTools.register({
   name: "setConfig",
-  description: "修改此视频生成节点的模型、时长、分辨率、比例、模式或声音；先用 getConfig 查询能力，providerId 与 modelId 必须同时提供；mode 使用返回的原始字符串或数组，须匹配当前引用；不修改提示词、不启动生成",
+  description: "修改此视频生成节点的模型、时长、分辨率、比例、模式、声音或自定义配置 other；先用 getConfig 查询能力，providerId 与 modelId 必须同时提供；other 按目标模型 rules 的 field 和值要求填写，仅更新传入字段，其余保留，切换模型时使用新模型默认值；mode 使用返回的原始字符串或数组，须匹配当前引用；不修改提示词、不启动生成",
   parameters: z.strictObject({
     providerId: z.string().min(1).optional(),
     modelId: z.string().min(1).optional(),
@@ -458,6 +465,7 @@ nodeTools.register({
     ratio: z.enum(ratioOptions).optional(),
     mode: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]).optional(),
     generateAudio: z.boolean().optional(),
+    other: z.record(z.string(), z.json()).optional(),
   }).refine((args) => (args.providerId === undefined) === (args.modelId === undefined), "providerId 与 modelId 必须同时提供"),
   async execute(args, { signal }) {
     signal?.throwIfAborted();
@@ -466,7 +474,7 @@ nodeTools.register({
     signal?.throwIfAborted();
     if (generating.value || deleting.value) throw new Error("节点正在生成或删除，请稍后修改配置");
     const choice = args.modelId === undefined ? selectedModel.value
-      : models.value.find((item) => item.providerId === args.providerId && item.modelId === args.modelId);
+      : findNodeModel(models.value, { providerId: args.providerId ?? "", modelId: args.modelId });
     if (!choice) throw new Error("请选择 getConfig 返回的有效视频模型");
     const durations = getDurations(choice);
     if (args.duration !== undefined && !durations.includes(args.duration)) throw new Error(`当前模型不支持时长 ${args.duration}，可选：${durations.join("、")}`);
@@ -476,12 +484,14 @@ nodeTools.register({
     const resolution = args.resolution ?? (resolutions.includes(data.value.resolution) ? data.value.resolution : resolutions[0] ?? "");
     if (args.mode !== undefined && !getMatchingModes(choice).some((item) => JSON.stringify(item) === JSON.stringify(args.mode))) throw new Error("所选模式不受当前模型支持或不适用于当前引用，请根据模型能力及已连接素材选择");
     if (args.generateAudio !== undefined && choice.audio !== "optional" && args.generateAudio !== (choice.audio === true)) throw new Error("当前模型不支持切换声音，请查看 getConfig 返回的 audio 能力");
-    data.value.model = JSON.stringify([choice.providerId, choice.modelId]);
+    const other = getModelFormValues(choice, choice === selectedModel.value ? data.value.other : {}, args.other);
+    data.value.model = getNodeModelKey(choice);
     data.value.duration = duration;
     data.value.resolution = resolution;
     if (args.ratio !== undefined) data.value.ratio = args.ratio;
     if (args.mode !== undefined) data.value.mode = JSON.stringify(args.mode);
     if (args.generateAudio !== undefined) data.value.generateAudio = args.generateAudio;
+    data.value.other = other;
     return getConfig();
   },
 });

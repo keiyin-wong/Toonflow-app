@@ -1,7 +1,7 @@
 <template>
   <div class="general">
     <ui />
-    <section class="settingSection" aria-labelledby="extensionAssociationsTitle">
+    <section v-if="!publicWeb" class="settingSection" aria-labelledby="extensionAssociationsTitle">
       <div class="settingHeader">
         <div class="settingInfo">
           <h3 id="extensionAssociationsTitle">默认打开方式</h3>
@@ -43,6 +43,18 @@
           :modelValue="generalSettings.agentNotificationsEnabled"
           aria-label="Agent 通知"
           @change="(value) => updateGeneralSettings({ agentNotificationsEnabled: value === true })" />
+      </div>
+    </section>
+    <section v-if="currentUser?.role !== 'user'" class="settingSection" aria-labelledby="assetFoldersExpandedTitle">
+      <div class="settingHeader">
+        <div class="settingInfo">
+          <h3 id="assetFoldersExpandedTitle">素材库文件夹默认展开</h3>
+          <p class="description">打开素材库时展开全部文件夹。关闭后默认收起，下次打开素材库生效。</p>
+        </div>
+        <el-switch
+          :modelValue="generalSettings.assetFoldersExpanded"
+          aria-label="素材库文件夹默认展开"
+          @change="(value) => updateGeneralSettings({ assetFoldersExpanded: value === true })" />
       </div>
     </section>
     <section class="settingSection" aria-labelledby="canvasCompositingTitle">
@@ -95,7 +107,7 @@
     </section>
     <nodeMenuSettings />
     <canvasShortcuts />
-    <extensionAssociationsDialog v-model="associationsVisible" />
+    <extensionAssociationsDialog v-if="!publicWeb" v-model="associationsVisible" />
   </div>
 </template>
 
@@ -103,6 +115,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { defaultUiSettings, generalSettings, uiSettings, updateGeneralSettings, updateUiSettings } from "@/stores/settings";
+import { currentUser, publicWeb } from "@/stores/multiTenant";
 import { getNotificationPermission, requestNotificationPermission } from "@/lib/notification";
 import { actualPlatform } from "@/lib/platform";
 import ui from "./ui.vue";

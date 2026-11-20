@@ -28,15 +28,15 @@
         </div>
         <promptInput v-model="promptModel" v-model:text="prompt" :references="referenceMentions" />
         <div class="promptFooter">
-          <el-select :modelValue="selectedModel ? model : ''" class="modelSelect" filterable :loading="modelsLoading" :disabled="generating" placeholder="选择模型" aria-label="生成模型" noDataText="请先在设置中添加模型" placement="top-start" @update:modelValue="model = $event" @visible-change="visible => visible && loadModels()">
+          <modelSelect :modelValue="selectedModel ? model : ''" :empty="!models.length" class="modelSelect" filterable :loading="modelsLoading" :disabled="generating" placeholder="选择模型" aria-label="生成模型" noDataText="请先在设置中添加模型" placement="top-start" @update:modelValue="model = $event" @visibleChange="(visible: boolean) => visible && loadModels()">
             <template v-if="!selectedModel" #prefix><icon-sparkles :size="17" /></template>
             <template #label="{ label }"><modelLabel :label="label" :providerId="selectedModel?.providerId" :modelId="selectedModel?.modelId" /></template>
             <el-option-group v-for="provider in modelGroups" :key="provider.id" :label="provider.label">
-              <el-option v-for="item in provider.models" :key="item.modelId" :label="item.label" :value="JSON.stringify([item.providerId, item.modelId])">
+              <el-option v-for="item in provider.models" :key="item.modelId" :label="item.label" :value="getNodeModelKey(item)">
                 <modelLabel :label="item.label" :providerId="item.providerId" :modelId="item.modelId" />
               </el-option>
             </el-option-group>
-          </el-select>
+          </modelSelect>
           <div class="promptActions">
             <el-button class="sendButton" :icon="IconArrowUp" :loading="generating" :disabled="!prompt.trim() || !selectedModel || generating || !textReady" title="生成" aria-label="生成" @click="generateText" />
           </div>
@@ -53,11 +53,12 @@
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from "vue";
-import { ElAlert, ElButton, ElCard, ElSelect, ElDialog, ElOption, ElOptionGroup, ElMessage, ElMessageBox } from "element-plus";
+import { ElAlert, ElButton, ElCard, ElDialog, ElOption, ElOptionGroup, ElMessage, ElMessageBox } from "element-plus";
 import { IconEdit, IconFileText, IconSparkles, IconArrowUp } from "@tabler/icons-vue";
-import { nodeSkeleton, nodeTools, useNode, z, type NodeAiModel, type NodeHandle } from "@toonflow/nodes-scaffold/runtime";
+import { getNodeModelIdentity, getNodeModelKey, nodeSkeleton, nodeTools, useNode, useNodeModelSelection, z, type NodeAiModel, type NodeHandle } from "@toonflow/nodes-scaffold/runtime";
 import { groupNodeModels } from "@toonflow/node-shared/groupNodeModels";
 import modelLabel from "@toonflow/node-shared/modelLabel";
+import modelSelect from "@toonflow/node-shared/modelSelect";
 import { useNodeReferences } from "@toonflow/node-shared/useNodeReferences";
 import markdownEditor from "./markdownEditor.vue";
 import markdownPreview from "./markdownPreview.vue";
@@ -77,6 +78,7 @@ defineOptions({
 });
 const { node, nodeProps, outputs, ai, files, nodeEvent, previewReady } = useNode({
   label: "文本",
+  onModelsChanged: () => void loadModels(),
   outputs: { text: { dataType: "STRING", value: "" } },
 });
 const { refList, referenceMentions, setReferencePreview, removeReference } = useNodeReferences();
@@ -98,7 +100,7 @@ const model = computed({ get: () => data.value.model ?? "", set: (value: string)
 const models = ref<NodeAiModel[]>([]);
 const modelsLoading = ref(false);
 const generating = ref(false);
-const selectedModel = computed(() => models.value.find(item => JSON.stringify([item.providerId, item.modelId]) === model.value));
+const selectedModel = useNodeModelSelection(models, model);
 const modelGroups = computed(() => groupNodeModels(models.value));
 const textReady = ref(false);
 const textReloading = ref(false);
@@ -218,7 +220,7 @@ async function loadModels() {
     models.value = await ai.getModels();
     if (!model.value) {
       const first = modelGroups.value[0]?.models[0];
-      model.value = first ? JSON.stringify([first.providerId, first.modelId]) : "";
+      model.value = first ? getNodeModelKey(first) : "";
     }
   } catch (error) {
     if (error instanceof Error && error.name !== "AbortError") ElMessage.error(error.message);
@@ -237,7 +239,7 @@ async function generateText() {
     const references = refList.value
       .filter(item => item.value !== undefined && (item.dataType === "STRING" || item.dataType === "IMAGE" || item.dataType === "VIDEO" || item.dataType === "FILE"))
       .map(item => item.dataType === "STRING" ? { dataType: item.dataType, value: item.value } : { dataType: item.dataType, value: { ...item.value } });
-    const input = { providerId: choice.providerId, modelId: choice.modelId, prompt: prompt.value.trim(), references };
+    const input = { ...getNodeModelIdentity(choice), prompt: prompt.value.trim(), references };
     const directory = references.some(item => item.dataType !== "STRING") ? (await textFiles.list()).directory : undefined;
     const result = await ai.generate({
       ...input,

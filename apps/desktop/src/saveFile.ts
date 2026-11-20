@@ -34,7 +34,7 @@ export async function selectSaveFile(fileName: string): Promise<string | null> {
     throw new Error(t`保存文件名无效，不能包含路径或控制字符`);
   }
   if (dialogOpen) throw new Error(t`已有保存窗口正在操作，请先完成或取消`);
-  if (process.platform !== "win32" && process.platform !== "darwin") throw new Error(t`当前系统不支持桌面另存为`);
+  if (!["win32", "darwin", "linux"].includes(process.platform)) throw new Error(t`当前系统不支持桌面另存为`);
   dialogOpen = true;
   try {
     const { stdout } = process.platform === "win32"
@@ -42,8 +42,13 @@ export async function selectSaveFile(fileName: string): Promise<string | null> {
         windowsHide: true,
         encoding: "utf8",
       })
-      : await execFileAsync("/usr/bin/osascript", ["-e", macDialog, "--", fileName, t`另存为`], { encoding: "utf8" });
-    const selected = stdout.replace(/\r?\n$/, "");
+      : process.platform === "darwin"
+        ? await execFileAsync("/usr/bin/osascript", ["-e", macDialog, "--", fileName, t`另存为`], { encoding: "utf8" })
+        : await execFileAsync("zenity", ["--file-selection", "--save", "--confirm-overwrite", "--title", t`另存为`, "--filename", fileName], { encoding: "utf8" });
+    // Windows Shell 扩展可能夹带输出，只读取辅助进程的路径记录。
+    const results = process.platform === "win32" ? [...stdout.matchAll(/^toonflowSaveFile:([A-Za-z0-9+/]*={0,2})\r?$/gm)] : null;
+    if (results && results.length !== 1) throw new Error(t`另存为窗口返回了无效的文件路径`);
+    const selected = results ? Buffer.from(results[0]![1]!, "base64").toString("utf8") : stdout.replace(/\r?\n$/, "");
     if (!selected) return null;
     if (!isAbsolute(selected) || /[\u0000-\u001f\u007f-\u009f]/.test(selected)) throw new Error(t`另存为窗口返回了无效的文件路径`);
     cleanupExpiredTokens();
@@ -51,6 +56,7 @@ export async function selectSaveFile(fileName: string): Promise<string | null> {
     pendingSaves.set(token, { path: selected, expiresAt: Date.now() + tokenTtlMs });
     return token;
   } catch (error) {
+    if (process.platform === "linux" && (error as { code?: number }).code === 1) return null;
     throw new Error(t`选择保存位置失败：${error instanceof Error ? error.message : String(error)}`, { cause: error });
   } finally {
     dialogOpen = false;

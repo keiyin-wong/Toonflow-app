@@ -10,10 +10,11 @@ import { errorFromCause } from "@/lib/responseFormat";
 import desktopRequest from "@/lib/desktop";
 import { getRuntimePlatform } from "@/lib/platform";
 import initializePlugins from "@/utils/plugins/initialize";
-import { languageRequest, resolveRequestLocale, runWithLocale, setLocaleFallback, translateError, translateMessage } from "@/lib/i18n";
+import { languageRequest, setLocaleFallback, translateError, translateMessage } from "@/lib/i18n";
 import { detectLocale, normalizeLocale } from "@toonflow/i18n";
 
-const autoInstallProviders = ["apiMart.ts", "metaso.ts", "compshare.ts", "dreamina.ts"];
+// 上游内置供应商已改为在线渠道；本分支仅保留本地 Dreamina 的自动安装。
+const autoInstallProviders = ["dreamina.ts"];
 
 export async function createApp({
   webRoot,
@@ -67,7 +68,6 @@ export async function createApp({
     const { default: initializeExt } = await import("@/utils/plugins/initializeExt");
     await initializeExt(resolve(dataDirectory, "ext"), extRoot, pluginRevision);
   }
-  // ACT: 内置媒体供应商随构建同步，其他供应商文件和独立保存的配置保留。
   if (dataDirectory && providersRoot) {
     const sourceDirectory = resolve(providersRoot, "media");
     let providerRevision = pluginRevision;
@@ -96,9 +96,10 @@ export async function createApp({
         if (error.code === "ENOENT") return [];
         throw error;
       }) : [];
-      const pattern = type === "tool" ? /^[a-z][a-zA-Z0-9]*\.tool\.js$/ : type === "ext" ? /^ext-[a-z][a-zA-Z0-9]*\.umd\.js$/ : /^[a-z][a-zA-Z0-9]*\.umd\.js$/;
-      const names = entries.filter(entry => type === "skill" || type === "agent" ? entry.isDirectory() : entry.isFile() && pattern.test(entry.name))
-        .map(entry => entry.isDirectory() ? entry.name : entry.name.replace(/\.(?:tool|umd)\.js$/, ""));
+      const extNameFromFile = type === "ext" ? (await import("@/utils/plugins/ext")).extNameFromFile : undefined;
+      const pattern = type === "tool" ? /^[a-z][a-zA-Z0-9]*\.tool\.js$/ : /^[a-z][a-zA-Z0-9]*\.umd\.js$/;
+      const names = entries.filter(entry => type === "skill" || type === "agent" ? entry.isDirectory() : entry.isFile() && (extNameFromFile ? !!extNameFromFile(entry.name) : pattern.test(entry.name)))
+        .map(entry => entry.isDirectory() ? entry.name : extNameFromFile ? extNameFromFile(entry.name)! : entry.name.replace(/\.(?:tool|umd)\.js$/, ""));
       return [type, new Set(names)];
     }),
   ));
@@ -109,6 +110,12 @@ export async function createApp({
   }
   app.use(cors());
   app.use(languageRequest);
+  const { initializeMultiTenantRuntime, multiTenantAccess } = await import("@/utils/multiTenant/runtime");
+  initializeMultiTenantRuntime(app);
+  app.use(multiTenantAccess);
+  const { initializePluginServerRuntime } = await import("@/utils/pluginServer");
+  initializePluginServerRuntime(app);
+  app.use("/api/pluginServer/message", express.json({ limit: "12mb" }));
   app.use("/a2a", express.json({ limit: "2mb" }));
   app.use(["/api/workspaces/files/write", "/api/assets/save"], express.raw({ type: "application/octet-stream", limit: "100mb" }));
   app.use(express.json({ limit: "100mb" }));
@@ -117,14 +124,14 @@ export async function createApp({
 
   const router = await import("@/router");
   router.default(app);
-  const [{ createMcpRouter }, { getMcpTools }, { authorizeMcp }, { skillResources }] = await Promise.all([
+  const [{ createMcpRouter }, { getMcpTools, runInMcpRequest }, { authorizeMcp }, { skillResources }] = await Promise.all([
     import("@toonflow/mcp"),
     import("@/utils/mcp/tools"),
     import("@/utils/mcp/control"),
     import("@/utils/mcp/resources"),
   ]);
   app.use("/mcp", createMcpRouter({ getTools: getMcpTools, authorize: authorizeMcp, resources: skillResources,
-    runInRequest: (request, operation) => runWithLocale(resolveRequestLocale(request.get("accept-language")), operation),
+    runInRequest: runInMcpRequest,
     translate: translateMessage,
     translateError,
   }));

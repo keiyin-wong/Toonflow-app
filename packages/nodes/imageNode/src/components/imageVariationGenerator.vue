@@ -1,13 +1,13 @@
 <template>
   <footer class="variationFooter">
-    <el-select :modelValue="selectedModel ? settings.model : ''" class="modelSelect" filterable :loading="modelsLoading" :disabled="busy" placeholder="选择图片模型" :aria-label="`${label}模型`" noDataText="请先在设置中添加图片模型" placement="top-start" @update:modelValue="settings.model = $event" @visible-change="visible => visible && refreshModels()">
+    <modelSelect :modelValue="selectedModel ? settings.model : ''" :empty="!models.length" class="modelSelect" filterable :loading="modelsLoading" :disabled="busy" placeholder="选择图片模型" :aria-label="`${label}模型`" noDataText="请先在设置中添加图片模型" placement="top-start" @update:modelValue="settings.model = $event" @visibleChange="(visible: boolean) => visible && refreshModels()">
       <template #label="{ label }"><modelLabel :label="label" :providerId="selectedModel?.providerId" :modelId="selectedModel?.modelId" /></template>
       <el-option-group v-for="provider in modelGroups" :key="provider.id" :label="provider.label">
-        <el-option v-for="model in provider.models" :key="model.modelId" :label="model.label" :value="JSON.stringify([model.providerId, model.modelId])">
+        <el-option v-for="model in provider.models" :key="model.modelId" :label="model.label" :value="getNodeModelKey(model)">
           <modelLabel :label="model.label" :providerId="model.providerId" :modelId="model.modelId" />
         </el-option>
       </el-option-group>
-    </el-select>
+    </modelSelect>
     <el-popover trigger="click" placement="top" :width="220" :disabled="busy || !selectedModel" :showArrow="false">
       <template #reference><el-button class="sizeButton" text :disabled="busy || !selectedModel" :aria-label="`${label}输出设置`">{{ settings.ratio || '比例' }} · {{ settings.size || '分辨率' }}</el-button></template>
       <div class="variationSettings nodrag nopan nowheel" @pointerdown.stop @mousedown.stop @wheel.stop @keydown.stop>
@@ -24,9 +24,10 @@ import { computed, onMounted, onScopeDispose, ref, watch } from "vue";
 import { useNode, useVueFlow } from "@vue-flow/core";
 import { ElButton, ElOption, ElOptionGroup, ElPopover, ElSelect } from "element-plus";
 import { IconSparkles } from "@tabler/icons-vue";
-import { useNodeAi, useNodeToolsContext, type NodeMediaModel, type NodeMediaValue } from "@toonflow/nodes-scaffold/runtime";
+import { getNodeModelKey, useNodeAi, useNodeModelSelection, useNodeToolsContext, type NodeMediaModel, type NodeMediaValue } from "@toonflow/nodes-scaffold/runtime";
 import { groupNodeModels } from "@toonflow/node-shared/groupNodeModels";
 import modelLabel from "@toonflow/node-shared/modelLabel";
+import modelSelect from "@toonflow/node-shared/modelSelect";
 import { showNodeError } from "@toonflow/node-shared/showNodeError";
 import { useImageVariationNode } from "../useImageVariationNode";
 
@@ -43,14 +44,14 @@ const emit = defineEmits<{ generated: [] }>();
 const generating = defineModel<boolean>("generating", { default: false });
 const { id, node } = useNode();
 const { findNode, getEdges } = useVueFlow();
-const ai = useNodeAi();
+const ai = useNodeAi({ onModelsChanged: () => void refreshModels() });
 const getNodeTools = useNodeToolsContext();
 const createVariation = useImageVariationNode();
 const models = ref<NodeMediaModel[]>([]);
 const modelsLoading = ref(false);
 const busy = computed(() => props.disabled || generating.value);
 const modelGroups = computed(() => groupNodeModels(models.value));
-const selectedModel = computed(() => models.value.find(item => JSON.stringify([item.providerId, item.modelId]) === props.settings.model));
+const selectedModel = useNodeModelSelection(models, computed({ get: () => props.settings.model, set: value => { props.settings.model = value; } }));
 const sizeOptions = computed(() => selectedModel.value?.imageSizes?.length ? selectedModel.value.imageSizes : ["2K"]);
 const ratioOptions = computed(() => selectedModel.value?.imageRatios?.length ? selectedModel.value.imageRatios : ["16:9"]);
 let generationController: AbortController | undefined;
@@ -93,7 +94,7 @@ async function refreshModels() {
     models.value = result.filter(item => item.type === "image");
     if (!props.settings.model) {
       const choice = modelGroups.value[0]?.models[0];
-      props.settings.model = choice ? JSON.stringify([choice.providerId, choice.modelId]) : "";
+      props.settings.model = choice ? getNodeModelKey(choice) : "";
     }
   } catch (error) { if (!disposed) showNodeError(error, "模型读取失败"); }
   finally { modelsLoading.value = false; }

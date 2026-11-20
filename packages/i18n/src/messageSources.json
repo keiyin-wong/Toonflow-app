@@ -11,12 +11,16 @@
   "本次更新目标": [
     "apps/web/src/App.vue"
   ],
-  "请前往 GitHub 最新发布页，选择适合当前系统的完整安装包，关闭客户端后重新安装。": [
+  "请前往 GitHub 最新发布页或官网 toonflow.net，选择适合当前系统的完整安装包，关闭客户端后重新安装。": [
     "apps/web/src/App.vue",
     "apps/web/src/components/settings/panels/about/index.vue"
   ],
   "稍后": [
     "apps/web/src/App.vue"
+  ],
+  "前往官网": [
+    "apps/web/src/App.vue",
+    "apps/web/src/components/settings/panels/about/index.vue"
   ],
   "前往下载页": [
     "apps/web/src/App.vue",
@@ -82,11 +86,19 @@
   ],
   "输入": [
     "apps/web/src/components/agent/conversation/contextUsage.vue",
-    "apps/web/src/components/settings/panels/account/modelCatalog.vue"
+    "apps/web/src/components/settings/panels/account/modelCatalog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "输出": [
     "apps/web/src/components/agent/conversation/contextUsage.vue",
-    "apps/web/src/components/settings/panels/account/modelCatalog.vue"
+    "apps/web/src/components/settings/panels/account/modelCatalog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "缓存命中": [
     "apps/web/src/components/agent/conversation/contextUsage.vue"
@@ -96,11 +108,11 @@
   ],
   "松开添加附件": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "图片、视频、文档或代码文件": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "编辑消息": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
@@ -132,10 +144,11 @@
     "apps/web/src/components/settings/panels/pluginMarket/pluginConfigDialog.vue",
     "apps/web/src/components/settings/panels/pluginMarket/skillEditorDialog.vue",
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
-    "apps/web/src/lib/desktopProtocol.ts",
     "apps/web/src/lib/i18n.ts",
     "apps/web/src/pages/home/index.vue",
-    "apps/web/src/pages/home/publishWorkDialog.vue",
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue",
+    "apps/web/src/pages/home/pages/projects/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue",
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/components/workspaceMenu.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
@@ -146,7 +159,17 @@
     "apps/web/src/pages/workspace/panels/document/components/fileTree.vue",
     "apps/web/src/pages/workspace/panels/document/components/openWithDialog.vue",
     "apps/web/src/pages/workspace/panels/document/components/workspaceSearch.vue",
-    "apps/desktop/src/index.ts"
+    "apps/desktop/src/index.ts",
+    "apps/web/src/components/agent/marketInstallApproval.vue",
+    "apps/web/src/lib/pluginInstallConfirmation.ts",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "调整输入框高度": [
     "apps/web/src/components/agent/conversation/messageInput.vue"
@@ -165,7 +188,7 @@
   ],
   "添加附件": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "生成期间仅支持发送文字": [
     "apps/web/src/components/agent/conversation/messageInput.vue"
@@ -222,20 +245,20 @@
   ],
   "只支持图片、视频和受支持的文本或文档文件": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "附件不能为空且不能超过 100 MB": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "文本附件不能超过 400 KB（400000 字节），请缩减内容后重试。": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
     "apps/web/src/components/agent/textAttachments.ts",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "每条消息最多添加 20 个附件": [
     "apps/web/src/components/agent/conversation/messageInput.vue",
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "对话消息": [
     "apps/web/src/components/agent/conversation/messageList.vue",
@@ -566,11 +589,14 @@
     "apps/web/src/components/settings/panels/personalization/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
-    "apps/web/src/main.ts",
-    "apps/web/src/pages/home/explore.vue",
-    "apps/web/src/pages/home/exploreDetail.vue",
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue",
+    "apps/web/src/pages/home/pages/explore/index.vue",
     "apps/web/src/pages/workspace/panels/document/components/extView.vue",
-    "apps/server/src/remoteConnection.ts"
+    "apps/server/src/remoteConnection.ts",
+    "apps/web/src/main.ts",
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "不支持": [
     "apps/web/src/components/agent/mentionMenu.vue"
@@ -608,7 +634,10 @@
   "文本": [
     "apps/web/src/components/agent/mentionMenu.vue",
     "apps/web/src/components/settings/panels/account/modelCatalog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/providerWeb/providerEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "整数": [
     "apps/web/src/components/agent/mentionMenu.vue"
@@ -625,7 +654,11 @@
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
-    "apps/server/src/utils/media/generation.ts"
+    "apps/server/src/utils/media/generation.ts",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "遮罩": [
     "apps/web/src/components/agent/mentionMenu.vue"
@@ -636,7 +669,11 @@
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
-    "apps/server/src/utils/media/generation.ts"
+    "apps/server/src/utils/media/generation.ts",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "音频": [
     "apps/web/src/components/agent/mentionMenu.vue",
@@ -644,7 +681,11 @@
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
-    "apps/server/src/utils/media/generation.ts"
+    "apps/server/src/utils/media/generation.ts",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "文件": [
     "apps/web/src/components/agent/mentionMenu.vue",
@@ -669,8 +710,8 @@
     "apps/web/src/components/settings/panels/developer/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
-    "apps/web/src/lib/desktopProtocol.ts",
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "搜索该节点的输出": [
     "apps/web/src/components/agent/mentionMenu.vue"
@@ -784,7 +825,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/skillEditorDialog.vue",
     "apps/web/src/components/videoPlayer.vue",
     "apps/web/src/pages/workspace/panels/document/components/editorTab.vue",
-    "apps/web/src/pages/workspace/panels/document/components/workspaceSearch.vue"
+    "apps/web/src/pages/workspace/panels/document/components/workspaceSearch.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "准备中": [
     "apps/web/src/components/agent/menu.vue"
@@ -809,7 +851,8 @@
   ],
   "已取消": [
     "apps/web/src/components/agent/menu.vue",
-    "apps/web/src/components/settings/panels/pluginMarket/ffmpeg.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/ffmpeg.vue",
+    "apps/server/src/utils/mcp/tools.ts"
   ],
   "等待补充": [
     "apps/web/src/components/agent/menu.vue",
@@ -830,13 +873,19 @@
     "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
     "apps/web/src/components/settings/panels/pluginMarket/pluginConfigDialog.vue",
     "apps/web/src/components/settings/panels/pluginMarket/skillEditorDialog.vue",
-    "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/projects/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue",
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetMenu.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/canvasMenu.vue",
     "apps/web/src/pages/workspace/panels/document/components/extView.vue",
-    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue"
+    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "选择 Agent 可以通过画布节点生成的媒体，保存后应用于所有对话。": [
     "apps/web/src/components/agent/nodeToolsDialog.vue"
@@ -922,7 +971,8 @@
   ],
   "请求失败": [
     "apps/web/src/components/agent/replyStream.ts",
-    "apps/web/src/lib/http.ts"
+    "apps/web/src/lib/http.ts",
+    "apps/web/src/components/agent/marketInstallApproval.vue"
   ],
   "连接已中断，请重试": [
     "apps/web/src/components/agent/replyStream.ts"
@@ -1025,8 +1075,8 @@
   ],
   "设备互联": [
     "apps/web/src/components/mobileConnect.vue",
-    "apps/web/src/components/settings/index.vue",
-    "apps/web/src/lib/mobile.ts"
+    "apps/web/src/lib/mobile.ts",
+    "apps/web/src/components/settings/index.vue"
   ],
   "连接方式": [
     "apps/web/src/components/mobileConnect.vue",
@@ -1035,6 +1085,12 @@
   ],
   "本机共享状态": [
     "apps/web/src/components/mobileConnect.vue"
+  ],
+  "本机命令输出超过 64 MB，已停止": [
+    "apps/server/src/utils/media/provider.ts"
+  ],
+  "本机命令运行超时，已停止": [
+    "apps/server/src/utils/media/provider.ts"
   ],
   "共享中": [
     "apps/web/src/components/mobileConnect.vue"
@@ -1075,8 +1131,8 @@
   "断开并独立运行": [
     "apps/web/src/components/mobileConnect.vue",
     "apps/web/src/components/settings/panels/deviceLink/index.vue",
-    "apps/web/src/main.ts",
-    "apps/server/src/remoteConnection.ts"
+    "apps/server/src/remoteConnection.ts",
+    "apps/web/src/main.ts"
   ],
   "连接目标": [
     "apps/web/src/components/mobileConnect.vue"
@@ -1094,7 +1150,8 @@
     "apps/web/src/components/mobileConnect.vue"
   ],
   "手动连接": [
-    "apps/web/src/components/mobileConnect.vue"
+    "apps/web/src/components/mobileConnect.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
   ],
   "在对方“设备互联”中展开“手动连接信息”，查看地址和配对码。": [
     "apps/web/src/components/mobileConnect.vue"
@@ -1162,6 +1219,7 @@
     "apps/web/src/components/mobileConnect.vue",
     "apps/web/src/components/settings/panels/deviceLink/index.vue",
     "apps/web/src/components/settings/panels/personalization/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/sceneProject.vue",
     "apps/web/src/pages/home/workspacePicker.vue"
   ],
   "请扫描 Toonflow 的设备互联二维码": [
@@ -1260,10 +1318,10 @@
     "apps/web/src/components/settings/ffmpegRequired.vue"
   ],
   "设置": [
-    "apps/web/src/components/settings/index.vue",
     "apps/web/src/components/settings/panels/general/index.vue",
-    "apps/web/src/pages/home/index.vue",
-    "apps/web/src/pages/workspace/components/workspaceMenu.vue"
+    "apps/web/src/pages/home/homeAccount.vue",
+    "apps/web/src/pages/workspace/components/workspaceMenu.vue",
+    "apps/web/src/components/settings/index.vue"
   ],
   "设置分类": [
     "apps/web/src/components/settings/index.vue"
@@ -1272,23 +1330,30 @@
     "apps/web/src/components/settings/index.vue"
   ],
   "账号与余额": [
-    "apps/web/src/components/settings/index.vue"
+    "apps/web/src/components/settings/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "通用设置": [
     "apps/web/src/components/settings/index.vue"
   ],
   "文本模型": [
-    "apps/web/src/components/settings/index.vue",
-    "apps/web/src/components/settings/panels/pluginMarket/a2aSettingsDialog.vue"
-  ],
-  "第三方模型": [
+    "apps/web/src/components/settings/panels/pluginMarket/a2aSettingsDialog.vue",
+    "apps/web/src/components/settings/toonflowProviderCard.vue",
     "apps/web/src/components/settings/index.vue"
   ],
+  "第三方模型": [
+    "apps/web/src/components/settings/index.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
   "媒体模型": [
+    "apps/web/src/components/settings/toonflowProviderCard.vue",
     "apps/web/src/components/settings/index.vue"
   ],
   "插件市场": [
-    "apps/web/src/components/settings/index.vue"
+    "apps/server/src/utils/mcp/tools.ts",
+    "apps/web/src/components/settings/index.vue",
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
   ],
   "市场": [
     "apps/web/src/components/settings/index.vue"
@@ -1303,14 +1368,15 @@
     "apps/web/src/components/settings/index.vue"
   ],
   "其他": [
-    "apps/web/src/components/settings/index.vue",
-    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue"
+    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
+    "apps/web/src/components/settings/index.vue"
   ],
   "开发者选项": [
     "apps/web/src/components/settings/index.vue"
   ],
   "多租户能力": [
-    "apps/web/src/components/settings/index.vue"
+    "apps/web/src/components/settings/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
   ],
   "关于": [
     "apps/web/src/components/settings/index.vue"
@@ -1321,10 +1387,12 @@
   "安装插件失败": [
     "apps/web/src/components/settings/installPluginFile.ts",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/web/src/lib/desktopProtocol.ts"
+    "apps/web/src/lib/desktopProtocol.ts",
+    "apps/web/src/lib/mcpControl.ts"
   ],
   "安装接口未返回有效的插件名称": [
-    "apps/web/src/components/settings/installPluginFile.ts"
+    "apps/web/src/components/settings/installPluginFile.ts",
+    "apps/web/src/pages/workspace/panels/canvas/useCanvasTools.ts"
   ],
   "版本更新": [
     "apps/web/src/components/settings/panels/about/index.vue"
@@ -1351,7 +1419,8 @@
     "apps/web/src/components/settings/panels/about/index.vue"
   ],
   "检查更新": [
-    "apps/web/src/components/settings/panels/about/index.vue"
+    "apps/web/src/components/settings/panels/about/index.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "自动更新": [
     "apps/web/src/components/settings/panels/about/index.vue"
@@ -1390,7 +1459,8 @@
   "查看": [
     "apps/web/src/components/settings/panels/about/index.vue",
     "apps/web/src/components/settings/panels/account/taskRecords.vue",
-    "apps/web/src/components/settings/panels/personalization/index.vue"
+    "apps/web/src/components/settings/panels/personalization/index.vue",
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
   ],
   "赞助商": [
     "apps/web/src/components/settings/panels/about/index.vue"
@@ -1400,14 +1470,14 @@
   ],
   "微信扫码洽谈商务合作": [
     "apps/web/src/components/settings/panels/about/index.vue",
-    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "成为赞助商": [
     "apps/web/src/components/settings/panels/about/index.vue"
   ],
   "Toonflow 商务合作二维码": [
     "apps/web/src/components/settings/panels/about/index.vue",
-    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "查看 {0} 详情": [
     "apps/web/src/components/settings/panels/about/index.vue"
@@ -1452,7 +1522,8 @@
     "apps/web/src/components/settings/panels/about/index.vue"
   ],
   "发现新版本": [
-    "apps/web/src/components/settings/panels/about/index.vue"
+    "apps/web/src/components/settings/panels/about/index.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "暂无更新": [
     "apps/web/src/components/settings/panels/about/index.vue"
@@ -1579,19 +1650,26 @@
   ],
   "确认密码": [
     "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue",
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "两次输入的密码不一致": [
     "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue",
     "apps/web/src/components/settings/panels/account/index.vue",
     "apps/server/src/routes/channel/user/forgotPassword.ts",
-    "apps/server/src/utils/channel/toonflow.ts"
+    "apps/server/src/utils/channel/toonflow.ts",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "请再次输入新密码": [
     "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue"
   ],
   "重置密码": [
-    "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue"
+    "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "密码重置成功，请重新登录": [
     "apps/web/src/components/settings/panels/account/forgotPasswordDialog.vue"
@@ -1613,26 +1691,37 @@
     "apps/web/src/components/settings/panels/account/wallet.vue",
     "apps/web/src/components/settings/panels/account/walletBonus.vue",
     "apps/web/src/components/settings/panels/deviceLink/index.vue",
-    "apps/web/src/components/settings/panels/mcp/index.vue"
+    "apps/web/src/components/settings/panels/mcp/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue"
   ],
   "退出登录": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "packages/multiTenant/userWeb/account.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "账号页面": [
     "apps/web/src/components/settings/panels/account/index.vue"
   ],
   "本金余额": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue"
   ],
   "充值": [
     "apps/web/src/components/settings/panels/account/index.vue",
-    "apps/web/src/components/settings/panels/account/wallet.vue"
+    "apps/web/src/components/settings/panels/account/wallet.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue",
+    "apps/web/src/components/settings/panels/account/rechargeDialog.vue",
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
   ],
   "可用赠送金": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue"
   ],
   "累计消费金额": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue"
   ],
   "用量概览（今日）": [
     "apps/web/src/components/settings/panels/account/index.vue"
@@ -1657,7 +1746,8 @@
     "apps/web/src/components/settings/panels/account/index.vue"
   ],
   "登录与注册": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
   ],
   "登录后直接使用 Toonflow": [
     "apps/web/src/components/settings/panels/account/index.vue"
@@ -1674,7 +1764,9 @@
   ],
   "密码": [
     "apps/web/src/components/settings/panels/account/index.vue",
-    "apps/web/src/components/settings/panels/network/index.vue"
+    "apps/web/src/components/settings/panels/network/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "请输入密码": [
     "apps/web/src/components/settings/panels/account/index.vue",
@@ -1694,7 +1786,10 @@
     "apps/web/src/components/settings/panels/account/smsCodeButton.vue"
   ],
   "登录": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "昵称": [
     "apps/web/src/components/settings/panels/account/index.vue"
@@ -1707,10 +1802,13 @@
     "apps/web/src/components/settings/panels/account/index.vue"
   ],
   "注册": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "packages/multiTenant/userWeb/index.vue"
   ],
   "总览": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
   ],
   "钱包": [
     "apps/web/src/components/settings/panels/account/index.vue",
@@ -1737,10 +1835,14 @@
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
     "apps/web/src/components/settings/panels/account/taskRecords.vue",
     "apps/web/src/components/settings/panels/account/wallet.vue",
-    "apps/web/src/components/settings/panels/account/walletBonus.vue"
+    "apps/web/src/components/settings/panels/account/walletBonus.vue",
+    "packages/multiTenant/adminWeb/index.vue"
   ],
   "加载余额失败，请刷新重试": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue",
+    "apps/web/src/components/settings/panels/account/rechargeDialog.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "加载用量失败，请刷新重试": [
     "apps/web/src/components/settings/panels/account/index.vue"
@@ -1752,7 +1854,9 @@
     "apps/web/src/components/settings/panels/account/index.vue"
   ],
   "登录失败": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/desktop/src/index.ts",
+    "packages/multiTenant/adminWeb/index.vue"
   ],
   "注册成功，请登录": [
     "apps/web/src/components/settings/panels/account/index.vue"
@@ -1761,10 +1865,12 @@
     "apps/web/src/components/settings/panels/account/index.vue"
   ],
   "已退出登录": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "退出登录失败": [
-    "apps/web/src/components/settings/panels/account/index.vue"
+    "apps/web/src/components/settings/panels/account/index.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
   ],
   "模型分类": [
     "apps/web/src/components/settings/panels/account/modelCatalog.vue"
@@ -1805,16 +1911,21 @@
     "apps/web/src/components/settings/panels/account/modelCatalog.vue"
   ],
   "缓存读取": [
-    "apps/web/src/components/settings/panels/account/modelCatalog.vue"
+    "apps/web/src/components/settings/panels/account/modelCatalog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "缓存写入": [
-    "apps/web/src/components/settings/panels/account/modelCatalog.vue"
+    "apps/web/src/components/settings/panels/account/modelCatalog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
   ],
   "全部": [
     "apps/web/src/components/settings/panels/account/modelCatalog.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/web/src/pages/home/explore.vue",
-    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "周日": [
     "apps/web/src/components/settings/panels/account/modelCatalog.vue"
@@ -1874,7 +1985,8 @@
   ],
   "查询": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
-    "apps/web/src/components/settings/panels/account/taskRecords.vue"
+    "apps/web/src/components/settings/panels/account/taskRecords.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "清除": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
@@ -1913,11 +2025,19 @@
   "状态": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
     "apps/web/src/components/settings/panels/account/taskRecords.vue",
-    "apps/web/src/components/settings/panels/account/wallet.vue"
+    "apps/web/src/components/settings/panels/account/wallet.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/userWeb/account.vue"
   ],
   "操作": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
-    "apps/web/src/pages/home/workspacePicker.vue"
+    "apps/web/src/pages/home/workspacePicker.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "删除凭证 {0}": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue"
@@ -1950,7 +2070,8 @@
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue",
-    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue"
+    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "限额": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue"
@@ -1969,7 +2090,9 @@
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
   ],
   "启用": [
-    "apps/web/src/components/settings/panels/account/subAccounts.vue"
+    "apps/web/src/components/settings/panels/account/subAccounts.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
   ],
   "停用": [
     "apps/web/src/components/settings/panels/account/subAccounts.vue",
@@ -2041,7 +2164,8 @@
     "apps/web/src/components/settings/panels/account/taskRecords.vue"
   ],
   "创建时间": [
-    "apps/web/src/components/settings/panels/account/taskRecords.vue"
+    "apps/web/src/components/settings/panels/account/taskRecords.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "完成时间": [
     "apps/web/src/components/settings/panels/account/taskRecords.vue"
@@ -2094,6 +2218,9 @@
   ],
   "我的余额": [
     "apps/web/src/components/settings/panels/account/wallet.vue"
+  ],
+  "我已了解风险，继续": [
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "充值记录": [
     "apps/web/src/components/settings/panels/account/wallet.vue"
@@ -2471,7 +2598,8 @@
     "apps/web/src/components/settings/panels/developer/index.vue"
   ],
   "强制安装（允许覆盖同版本或降级）": [
-    "apps/web/src/components/settings/panels/developer/index.vue"
+    "apps/web/src/components/settings/panels/developer/index.vue",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "选择本地{0}文件": [
     "apps/web/src/components/settings/panels/developer/index.vue"
@@ -2560,9 +2688,9 @@
     "apps/web/src/components/settings/panels/developer/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
-    "apps/web/src/lib/desktopProtocol.ts",
     "apps/web/src/pages/workspace/panels/document/components/openWithDialog.vue",
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "选择扩展脚手架打包的 ext-*.umd.js 文件。": [
     "apps/web/src/components/settings/panels/developer/index.vue"
@@ -2571,8 +2699,8 @@
     "apps/web/src/components/settings/panels/developer/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
-    "apps/web/src/lib/desktopProtocol.ts",
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "支持包含技能与资源的 .zip 包、SKILL.md，以及 .tar、.tar.gz、.tgz 包。": [
     "apps/web/src/components/settings/panels/developer/index.vue"
@@ -2581,8 +2709,8 @@
     "apps/web/src/components/settings/panels/developer/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
-    "apps/web/src/lib/desktopProtocol.ts",
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "选择脚手架打包的 .tool.js 文件。": [
     "apps/web/src/components/settings/panels/developer/index.vue"
@@ -2633,7 +2761,8 @@
     "apps/web/src/components/settings/panels/developer/providerDebugDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
     "apps/web/src/components/settings/panels/pluginMarket/mcpImportForm.vue",
-    "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "安装供应商": [
     "apps/web/src/components/settings/panels/developer/providerDebugDialog.vue"
@@ -2719,7 +2848,8 @@
     "apps/web/src/components/settings/panels/deviceLink/index.vue"
   ],
   "连接地址": [
-    "apps/web/src/components/settings/panels/deviceLink/index.vue"
+    "apps/web/src/components/settings/panels/deviceLink/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
   ],
   "复制地址": [
     "apps/web/src/components/settings/panels/deviceLink/index.vue"
@@ -2757,7 +2887,12 @@
   ],
   "重新加载": [
     "apps/web/src/components/settings/panels/deviceLink/index.vue",
-    "apps/web/src/components/settings/panels/personalization/index.vue"
+    "apps/web/src/components/settings/panels/personalization/index.vue",
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "高级选项": [
     "apps/web/src/components/settings/panels/deviceLink/index.vue"
@@ -2997,6 +3132,12 @@
   "当前浏览器不支持系统通知。": [
     "apps/web/src/components/settings/panels/general/index.vue"
   ],
+  "素材库文件夹默认展开": [
+    "apps/web/src/components/settings/panels/general/index.vue"
+  ],
+  "打开素材库时展开全部文件夹。关闭后默认收起，下次打开素材库生效。": [
+    "apps/web/src/components/settings/panels/general/index.vue"
+  ],
   "画布合成优化": [
     "apps/web/src/components/settings/panels/general/index.vue"
   ],
@@ -3096,7 +3237,10 @@
     "apps/web/src/components/settings/panels/personalization/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
-    "apps/desktop/src/index.ts"
+    "apps/desktop/src/index.ts",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "编辑菜单": [
     "apps/web/src/components/settings/panels/general/nodeMenuSettings.vue"
@@ -3229,6 +3373,9 @@
   "明亮清晰": [
     "apps/web/src/components/settings/panels/general/ui.vue"
   ],
+  "命令行调用警告": [
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
+  ],
   "深色": [
     "apps/web/src/components/settings/panels/general/ui.vue"
   ],
@@ -3257,7 +3404,8 @@
     "apps/web/src/components/settings/panels/general/ui.vue"
   ],
   "编辑供应商": [
-    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "添加自定义供应商": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
@@ -3271,7 +3419,10 @@
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "供应商的显示名称": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
@@ -3296,11 +3447,14 @@
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/providerAgentDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/providerAgentDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "模型显示名称": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "展开模型设置": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
@@ -3309,7 +3463,8 @@
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
   ],
   "上下文窗口": [
-    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "最大输出 token": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
@@ -3410,23 +3565,29 @@
   ],
   "供应商已不存在": [
     "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/languageModel/index.vue",
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
   "添加供应商": [
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
     "apps/web/src/components/settings/panels/languageModel/index.vue",
-    "apps/web/src/components/settings/panels/mediaModel/index.vue"
+    "apps/web/src/components/settings/panels/mediaModel/index.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "选择厂商": [
-    "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
   ],
   "连接配置": [
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "正在获取…": [
-    "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue"
+    "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue",
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
   ],
   "未获取到模型": [
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue"
@@ -3444,7 +3605,19 @@
   "此供应商已添加，请在供应商列表中编辑": [
     "apps/web/src/components/settings/panels/languageModel/addProviderDialog.vue"
   ],
+  "可升级至 v{0}": [
+    "apps/web/src/components/settings/panels/languageModel/index.vue",
+    "apps/web/src/components/settings/panels/mediaModel/index.vue"
+  ],
   "{0} 个模型": [
+    "apps/web/src/components/settings/panels/languageModel/index.vue",
+    "apps/web/src/components/settings/panels/mediaModel/index.vue",
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
+  ],
+  "升级会用新版替换此供应商的地址、请求头和模型列表，API Key 保留。确定升级？": [
+    "apps/web/src/components/settings/panels/languageModel/index.vue"
+  ],
+  "升级": [
     "apps/web/src/components/settings/panels/languageModel/index.vue",
     "apps/web/src/components/settings/panels/mediaModel/index.vue"
   ],
@@ -3454,6 +3627,10 @@
   ],
   "配置格式错误": [
     "apps/web/src/components/settings/panels/languageModel/index.vue"
+  ],
+  "升级失败，请重试": [
+    "apps/web/src/components/settings/panels/languageModel/index.vue",
+    "apps/web/src/components/settings/panels/mediaModel/index.vue"
   ],
   "删除失败，请重试": [
     "apps/web/src/components/settings/panels/languageModel/index.vue",
@@ -3469,7 +3646,10 @@
     "apps/web/src/components/settings/panels/mcp/index.vue"
   ],
   "已开启": [
-    "apps/web/src/components/settings/panels/mcp/index.vue"
+    "apps/web/src/components/settings/panels/mcp/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
   ],
   "已关闭": [
     "apps/web/src/components/settings/panels/mcp/index.vue"
@@ -3572,7 +3752,8 @@
   "供应商文件": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
     "apps/web/src/components/settings/panels/mediaModel/providerAgentDialog.vue",
-    "apps/server/src/routes/providers/media/add.ts"
+    "apps/server/src/routes/providers/media/add.ts",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "尚未选择文件": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
@@ -3585,7 +3766,8 @@
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
   ],
   "供应商代码": [
-    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "供应商文件链接": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
@@ -3642,17 +3824,22 @@
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
   ],
   "文件导入": [
-    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "粘贴代码": [
-    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "通过链接获取": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
   ],
   "读取供应商代码失败": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue",
+    "apps/web/src/lib/builtinProviders.ts",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
   ],
   "请先在「工具市场」安装并启用网页浏览器工具": [
     "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
@@ -3706,7 +3893,8 @@
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
   "模型配置": [
-    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
   ],
   "手动添加": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
@@ -3729,53 +3917,64 @@
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
   "暂无模型": [
-    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "测试媒体模型：{0}": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
   "单图参考": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "多图参考": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "首尾帧必填": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "尾帧可选": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "首帧可选": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "图片参考": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "视频参考": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "音频参考": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "供应商代码已更新，请重新打开编辑窗口后测试": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
   "文生图": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "文生视频": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请填写第 {0} 个模型的 ID 和显示名称": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
@@ -3795,12 +3994,17 @@
   "模型已保存，连接配置未保存：{0}。填写内容已保留，请重试。": [
     "apps/web/src/components/settings/panels/mediaModel/editProviderDialog.vue"
   ],
+  "升级会用新版代码覆盖此供应商，自行修改的代码和模型不会保留，连接配置保留。确定升级？": [
+    "apps/web/src/components/settings/panels/mediaModel/index.vue"
+  ],
   "获取模型": [
     "apps/web/src/components/settings/panels/mediaModel/index.vue"
   ],
   "编辑模型": [
     "apps/web/src/components/settings/panels/mediaModel/index.vue",
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "编辑代码": [
     "apps/web/src/components/settings/panels/mediaModel/index.vue"
@@ -3822,112 +4026,151 @@
     "apps/web/src/components/settings/panels/mediaModel/index.vue"
   ],
   "添加模型": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "模型类型": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
   ],
   "文本（旧配置）": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "图片生成模式": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "视频生成模式": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "{0}数量": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "音频输出": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "可选音频": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "始终输出音频": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "无音频": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "时长与分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "时长（秒）": [
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
+    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "分辨率": [
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
-    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
+    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "输入后按回车": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "第 {0} 组时长": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "第 {0} 组分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "删除第 {0} 组时长与分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "添加时长与分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "更多配置（JSON）": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "模型的更多配置": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "确定": [
     "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
-    "apps/web/src/components/settings/panels/network/index.vue"
+    "apps/web/src/components/settings/panels/network/index.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "混合参考": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请填写显示名称和模型 ID": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "模型 ID 已存在：{0}": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "更多配置不是有效的 JSON": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "更多配置必须是 JSON 对象": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "已有表单项请直接在上方编辑": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "更多配置中的 mode 必须是数组": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请选择混合参考的媒体类型": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "参考数量必须是正整数": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请至少选择一种生成模式": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请至少添加一组时长与分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "第 {0} 组时长必须是正数": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "请填写第 {0} 组分辨率": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue"
   ],
   "模型配置无效": [
-    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue"
+    "apps/web/src/components/settings/panels/mediaModel/modelEditorDialog.vue",
+    "packages/providerWeb/modelEditorDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "AI 修改媒体供应商": [
     "apps/web/src/components/settings/panels/mediaModel/providerAgentDialog.vue"
@@ -3982,7 +4225,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetMenu.vue",
-    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue"
+    "apps/web/src/pages/workspace/panels/document/components/fileTree.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
   ],
   "供应商代码预览": [
     "apps/web/src/components/settings/panels/mediaModel/providerAgentDialog.vue"
@@ -4057,7 +4301,7 @@
   ],
   "提示词": [
     "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue",
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "测试提示词": [
     "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
@@ -4084,7 +4328,8 @@
     "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
   ],
   "画面比例": [
-    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
+    "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
   ],
   "尺寸": [
     "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
@@ -4179,17 +4424,17 @@
     "apps/web/src/components/settings/panels/mediaModel/providerTestPanel.vue"
   ],
   "正在开发": [
-    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "Toonflow 将在后续更新中推出多租户能力，敬请期待。": [
-    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "商务合作": [
-    "apps/web/src/components/settings/panels/multiTenant/index.vue",
-    "apps/web/src/pages/workspace/index.vue"
+    "apps/web/src/pages/workspace/index.vue",
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "接受定制化功能开发或私有化部署，欢迎联系我们洽谈需求。": [
-    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+    "apps/web/src/components/settings/panels/multiTenant/developmentNotice.vue"
   ],
   "代理模式": [
     "apps/web/src/components/settings/panels/network/index.vue"
@@ -4413,7 +4658,9 @@
     "apps/web/src/components/settings/panels/pluginMarket/agentEditorDialog.vue"
   ],
   "说明": [
-    "apps/web/src/components/settings/panels/pluginMarket/agentEditorDialog.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/agentEditorDialog.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
   ],
   "保存当前文件": [
     "apps/web/src/components/settings/panels/pluginMarket/agentEditorDialog.vue"
@@ -4615,7 +4862,9 @@
   ],
   "安装插件": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/web/src/lib/desktopProtocol.ts"
+    "apps/web/src/components/agent/toolMessage.vue",
+    "apps/web/src/lib/pluginInstallConfirmation.ts",
+    "apps/server/src/utils/mcp/tools.ts"
   ],
   "插件类型": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
@@ -4658,7 +4907,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
   ],
   "内置": [
-    "apps/web/src/components/settings/panels/pluginMarket/index.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/index.vue",
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
   ],
   "已发布": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
@@ -4698,11 +4948,15 @@
   ],
   "已禁用": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
   ],
   "已启用": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/mcpServers.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
   ],
   "启用 {0}": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
@@ -4733,7 +4987,9 @@
   ],
   "配置": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue",
-    "apps/server/src/utils/mcp/servers.ts"
+    "apps/server/src/utils/mcp/servers.ts",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
   ],
   "及其附属文件": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
@@ -4787,7 +5043,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
   ],
   "检查插件市场状态失败，请重试": [
-    "apps/web/src/components/settings/panels/pluginMarket/index.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/index.vue",
+    "apps/web/src/components/settings/panels/pluginMarket/marketUpload.ts"
   ],
   "账号登录已失效，请到账号与余额重新登录": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
@@ -4814,6 +5071,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
   ],
   "{0}已更新": [
+    "apps/web/src/components/settings/panels/languageModel/index.vue",
+    "apps/web/src/components/settings/panels/mediaModel/index.vue",
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
   ],
   "{0}已安装": [
@@ -4827,7 +5086,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
   ],
   "Agent 功能处于测试阶段，暂未开放安装": [
-    "apps/web/src/components/settings/panels/pluginMarket/index.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/index.vue",
+    "apps/server/src/lib/pluginMarket.ts"
   ],
   "导出插件失败，请重试": [
     "apps/web/src/components/settings/panels/pluginMarket/index.vue"
@@ -5185,7 +5445,8 @@
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue"
   ],
   "重新读取": [
-    "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue"
+    "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue"
   ],
   "重新提交审核": [
     "apps/web/src/components/settings/panels/pluginMarket/uploadPluginDialog.vue"
@@ -5363,7 +5624,8 @@
   ],
   "打开": [
     "apps/web/src/components/videoPlayer.vue",
-    "apps/web/src/pages/workspace/panels/document/components/openWithDialog.vue"
+    "apps/web/src/pages/workspace/panels/document/components/openWithDialog.vue",
+    "apps/web/src/pages/home/pages/projects/projectCard.vue"
   ],
   "切换视频": [
     "apps/web/src/components/videoPlayer.vue"
@@ -5446,7 +5708,7 @@
   ],
   "适应画布": [
     "apps/web/src/lib/canvasShortcuts.ts",
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "滚轮缩放": [
     "apps/web/src/lib/canvasShortcuts.ts"
@@ -5546,18 +5808,14 @@
     "apps/web/src/lib/clipboard.ts"
   ],
   "供应商": [
-    "apps/web/src/lib/desktopProtocol.ts",
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
   ],
   "待确认的安装请求过多，请稍后重试": [
     "apps/web/src/lib/desktopProtocol.ts",
     "apps/desktop/src/index.ts"
-  ],
-  "插件可能执行代码并访问本地文件，请仅安装信任来源的插件。": [
-    "apps/web/src/lib/desktopProtocol.ts"
-  ],
-  "确认安装": [
-    "apps/web/src/lib/desktopProtocol.ts"
   ],
   "正在安装插件…": [
     "apps/web/src/lib/desktopProtocol.ts"
@@ -5635,10 +5893,12 @@
   "返回": [
     "apps/web/src/lib/i18n.ts",
     "apps/web/src/pages/hello/index.vue",
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "确认": [
-    "apps/web/src/lib/i18n.ts"
+    "apps/web/src/lib/i18n.ts",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
   ],
   "错误": [
     "apps/web/src/lib/i18n.ts"
@@ -5717,7 +5977,7 @@
   ],
   "分享": [
     "apps/web/src/lib/i18n.ts",
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "工作区已切换，本次调用已停止": [
     "apps/web/src/lib/mcpControl.ts",
@@ -5822,6 +6082,7 @@
   ],
   "请先选择工作目录": [
     "apps/web/src/lib/workspaceFiles.ts",
+    "apps/web/src/pages/home/pages/trumanMap/sceneProject.vue",
     "apps/web/src/pages/workspace/panels/canvas/canvasHost.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/canvasMenu.vue",
     "apps/web/src/pages/workspace/panels/canvas/index.vue",
@@ -5857,12 +6118,8 @@
   "前往微软官网更新": [
     "apps/web/src/main.ts"
   ],
-  "需要更新 WebView2": [
-    "apps/web/src/main.ts"
-  ],
-  "启动失败": [
-    "apps/web/src/main.ts"
-  ],
+  "需要更新 WebView2": [],
+  "启动失败": [],
   "配置第三方模型": [
     "apps/web/src/pages/hello/index.vue"
   ],
@@ -5885,128 +6142,135 @@
     "apps/web/src/pages/hello/index.vue"
   ],
   "素材库": [
-    "apps/web/src/pages/home/assetLibraryDialog.vue",
     "apps/web/src/pages/home/index.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/canvasControls.vue"
   ],
-  "探索": [
-    "apps/web/src/pages/home/explore.vue",
+  "白模预演 TrumanMap": [
     "apps/web/src/pages/home/index.vue"
   ],
+  "白模预演": [
+    "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "探索": [
+    "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/explore/index.vue",
+    "apps/web/src/pages/home/pages/home/index.vue"
+  ],
   "搜索项目": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "搜索云端项目": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "发布作品": [
-    "apps/web/src/pages/home/explore.vue",
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue",
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目分类": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "云端项目": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "查看作品：{0}，作者 {1}": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/exploreCard.vue"
   ],
   "{0} 次点赞": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/exploreCard.vue"
   ],
   "未开放": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "正在加载作品…": [
-    "apps/web/src/pages/home/explore.vue",
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue",
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "云端分页游标重复，请重试": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "云端没有返回新的作品，请重试": [
     "apps/web/src/pages/home/explore.vue"
   ],
   "加载作品失败，请重试": [
-    "apps/web/src/pages/home/explore.vue"
+    "apps/web/src/pages/home/pages/explore/index.vue"
   ],
   "作品详情": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "返回探索": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "关闭作品详情": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "视频加载失败，请重试": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "该作品暂未提供可播放的视频": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "查看制作过程": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "克隆项目": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "加载作品详情失败": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "分享链接已复制": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "复制分享链接失败": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "加载制作过程失败": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "正在下载项目…": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "已下载到 {0}": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "已添加到项目列表 · {0}": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "项目已克隆并添加到项目列表": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "克隆项目失败": [
-    "apps/web/src/pages/home/exploreDetail.vue"
+    "apps/web/src/pages/home/pages/explore/exploreDetail.vue"
   ],
   "制作过程": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "返回作品详情": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "只读": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "关闭制作过程": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "正文": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "选择制作画布": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "画布缩放": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "缩小画布": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "放大画布": [
-    "apps/web/src/pages/home/exploreProcess.vue"
+    "apps/web/src/pages/home/pages/explore/exploreProcess.vue"
   ],
   "距离结束 {0} 天 {1} 小时 {2} 分": [
     "apps/web/src/pages/home/homeAdvertisement.vue"
@@ -6030,10 +6294,12 @@
     "apps/web/src/pages/home/index.vue"
   ],
   "展开侧栏": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
   ],
   "收起侧栏": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
   ],
   "首页导航": [
     "apps/web/src/pages/home/index.vue"
@@ -6043,48 +6309,105 @@
     "apps/web/src/pages/workspace/components/workspaceMenu.vue"
   ],
   "创建项目": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "今天要做点什么？": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "创作描述": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "发送": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "选择工作目录": [
-    "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/home/index.vue",
     "apps/web/src/pages/home/workspacePicker.vue"
   ],
   "请先选择一个空文件夹作为工作目录，画布和素材会保存在这里。": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "项目": [
     "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/projects/index.vue",
     "apps/server/src/routes/workspaces/files/export.ts"
   ],
   "选择空文件夹新建，或打开已有项目": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/projectLaunchCard.vue"
   ],
   "新建项目": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/projectLaunchCard.vue"
   ],
   "或打开已有项目": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/projectLaunchCard.vue"
+  ],
+  "一句话搭出白模场景，排好人物走位和镜头路线，开拍前先把整场戏走一遍。": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "写下场景布局、人物走位和镜头运动，生成可以反复调整的白模预演": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "预演描述": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "预演时长": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "生成预演": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "示例描述": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "我的白模场景": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "新建场景": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "移除场景": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "重命名场景": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "场景名称不能为空": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "自动时长": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "5 秒": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "10 秒": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "15 秒": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "雨夜巷口两人对峙，镜头从背后缓慢推近": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "地铁站台追逐戏，手持跟拍穿过人群": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
+  ],
+  "黄昏屋顶告别，镜头环绕一圈后拉到全景": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
   ],
   "打包导出项目 {0}": [
     "apps/web/src/pages/home/index.vue"
   ],
   "打包导出 ZIP": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "重命名项目 {0}": [
     "apps/web/src/pages/home/index.vue"
   ],
   "重命名": [
-    "apps/web/src/pages/home/index.vue",
+    "apps/web/src/pages/home/pages/projects/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue",
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetMenu.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/canvasMenu.vue",
@@ -6094,37 +6417,38 @@
     "apps/web/src/pages/home/index.vue"
   ],
   "从列表移除，不删除文件": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue",
+    "apps/web/src/pages/home/pages/trumanMap/index.vue"
   ],
   "描述你想创作的内容，让灵感从这里开始…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "把一个故事灵感，变成一段精彩的短片…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "为你的主角设计独特的外形和性格…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "创作一段雨夜街头的电影感镜头…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "把这段文字拆解成连贯的分镜画面…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "为一场奇幻冒险生成场景和角色…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "为你的画面配上一段合适的音乐…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "写一段温暖的旁白，讲述这个故事…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "设计一支富有想象力的产品宣传片…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "从一句话开始，搭建你的创作工作流…": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "当前设备不支持该设置项": [
     "apps/web/src/pages/home/index.vue"
@@ -6139,10 +6463,10 @@
     "apps/web/src/pages/home/index.vue"
   ],
   "添加附件失败，请重试": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "取回文本失败，请重试": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "项目“{0}”的文件夹不存在，是否重新选择文件夹？": [
     "apps/web/src/pages/home/index.vue"
@@ -6157,16 +6481,16 @@
     "apps/web/src/pages/home/index.vue"
   ],
   "导出项目失败，请重试": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "请输入项目名称": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "重命名项目": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "项目名称不能为空": [
-    "apps/web/src/pages/home/index.vue"
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "该文件夹不为空，请重新选择空文件夹；已有项目请使用“新建项目”入口或点击项目列表打开。": [
     "apps/web/src/pages/home/index.vue"
@@ -6175,118 +6499,120 @@
     "apps/web/src/pages/home/index.vue"
   ],
   "最近打开 {0}": [
-    "apps/web/src/pages/home/projectCard.vue"
+    "apps/web/src/pages/home/pages/projects/projectCard.vue"
   ],
   "选择文件夹": [
-    "apps/web/src/pages/home/publishProjectPicker.vue"
+    "apps/web/src/pages/home/pages/explore/publishProjectPicker.vue"
   ],
   "选择 ZIP 压缩包": [
-    "apps/web/src/pages/home/publishProjectPicker.vue"
+    "apps/web/src/pages/home/pages/explore/publishProjectPicker.vue"
   ],
   "无法读取文件夹，请重新选择": [
-    "apps/web/src/pages/home/publishProjectPicker.vue"
+    "apps/web/src/pages/home/pages/explore/publishProjectPicker.vue"
   ],
   "请选择非空的 ZIP 压缩包": [
-    "apps/web/src/pages/home/publishProjectPicker.vue"
+    "apps/web/src/pages/home/pages/explore/publishProjectPicker.vue"
   ],
   "选择项目": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "返回发布作品": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "上传作品": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "点击选择或拖入作品": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "支持 MP4、WebM 视频": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "更换作品": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "上传封面": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "更换封面": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "封面预览": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "选择作品封面": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "点击或拖入图片": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "作品名称": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "请输入作品名称": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "作品描述": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "请输入作品描述": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "公开项目": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "更换项目": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "移除项目": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue",
+    "apps/web/src/pages/home/pages/projects/index.vue"
   ],
   "文件内容为空，请重新选择": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "文件名不能超过 255 个字符": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "封面仅支持 JPG、PNG、WebP 图片": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "作品仅支持 MP4、WebM 视频": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目文件夹须包含 1 至 20000 个文件": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目文件总大小不能超过 512 MB": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目包含无效或重复的文件路径，请重新选择文件夹": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目 ZIP 不能为空且不能超过 512 MB": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "项目不是有效的 ZIP 压缩包": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "请先在账号设置中登录": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "请填写不超过 80 字的作品名称": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "请选择作品视频和封面": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "作品已提交，等待审核": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "作品提交失败，请重试": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue"
   ],
   "账号已变更，请确认登录账号后重新提交": [
-    "apps/web/src/pages/home/publishWorkDialog.vue"
+    "apps/web/src/pages/home/pages/explore/publishWorkDialog.vue",
+    "apps/web/src/components/settings/panels/pluginMarket/marketUpload.ts"
   ],
   "工作目录": [
     "apps/web/src/pages/home/workspacePicker.vue"
@@ -6339,6 +6665,7 @@
     "apps/web/src/pages/home/workspacePicker.vue"
   ],
   "请输入名称": [
+    "apps/web/src/pages/home/pages/trumanMap/index.vue",
     "apps/web/src/pages/home/workspacePicker.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/assetMenu.vue"
   ],
@@ -6570,10 +6897,10 @@
   "目标画布已切换，请重新查询画布": [
     "apps/web/src/pages/workspace/panels/canvas/canvasQueries.ts"
   ],
-  "分页游标无效，请重新查询": [
+  "分页游标无效。首次查询请省略 cursor；续页时请原样传入上次返回的 nextCursor。": [
     "apps/web/src/pages/workspace/panels/canvas/canvasQueries.ts"
   ],
-  "画布结构或查询参数已变化，分页游标失效，请重新查询": [
+  "画布或查询已变化，分页游标已失效。请省略 cursor 重新查询；续页时请原样传入上次返回的 nextCursor。": [
     "apps/web/src/pages/workspace/panels/canvas/canvasQueries.ts"
   ],
   "单项结果超过读取预算，请缩小 fields、dataKeys、names 或 textLimit；函数参数定义不会截断": [
@@ -6647,7 +6974,8 @@
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue"
   ],
   "更多操作": [
-    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue"
+    "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue",
+    "apps/web/src/pages/home/pages/projects/projectCard.vue"
   ],
   "没有找到匹配的素材": [
     "apps/web/src/pages/workspace/panels/canvas/components/assetBrowser.vue"
@@ -6668,7 +6996,9 @@
   ],
   "更多": [
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue",
-    "apps/web/src/pages/workspace/panels/canvas/components/canvasMenu.vue"
+    "apps/web/src/pages/workspace/panels/canvas/components/canvasMenu.vue",
+    "apps/web/src/pages/home/homeAccount.vue",
+    "apps/web/src/pages/home/pages/home/index.vue"
   ],
   "关闭音频预览": [
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue"
@@ -6703,6 +7033,9 @@
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue"
   ],
   "文件夹名称不能包含斜杠": [
+    "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue"
+  ],
+  "已保存 {0} 个素材到素材库": [
     "apps/web/src/pages/workspace/panels/canvas/components/assetLibrary.vue"
   ],
   "已保存到素材库": [
@@ -6964,6 +7297,9 @@
   "操作菜单": [
     "apps/web/src/pages/workspace/panels/canvas/components/nodeMenu.vue"
   ],
+  "添加到素材库": [
+    "apps/web/src/pages/workspace/panels/canvas/components/nodeMenu.vue"
+  ],
   "删除中…": [
     "apps/web/src/pages/workspace/panels/canvas/components/nodeMenu.vue"
   ],
@@ -7034,7 +7370,14 @@
     "apps/web/src/pages/workspace/panels/canvas/components/remoteNode.vue"
   ],
   "远程节点未加载，请确认插件已安装并启用": [
+    "apps/web/src/pages/home/pages/trumanMap/sceneProject.vue",
     "apps/web/src/pages/workspace/panels/canvas/components/remoteNode.vue"
+  ],
+  "TrumanMap 插件版本过旧，不支持白模预演，请更新插件后重试": [
+    "apps/web/src/pages/home/pages/trumanMap/sceneProject.vue"
+  ],
+  "该文件夹里的“白模预演.json”不是白模预演场景，请换一个文件夹": [
+    "apps/web/src/pages/home/pages/trumanMap/sceneProject.vue"
   ],
   "连接分组节点": [
     "apps/web/src/pages/workspace/panels/canvas/components/selectionHandle.vue"
@@ -7870,7 +8213,8 @@
   ],
   "分页已失效，请重新搜索": [
     "apps/server/src/agent/mentionSources.ts",
-    "apps/server/src/utils/assets/index.ts"
+    "apps/server/src/utils/assets/index.ts",
+    "apps/server/src/lib/pluginMarket.ts"
   ],
   "这个输出暂无内容，请重新选择": [
     "apps/server/src/agent/mentionSources.ts"
@@ -8019,7 +8363,8 @@
   "模型请求失败": [
     "apps/server/src/agent/runtime/index.ts",
     "apps/server/src/routes/ai/generate.ts",
-    "apps/server/src/utils/singleAgent/index.ts"
+    "apps/server/src/utils/singleAgent/index.ts",
+    "packages/multiTenant/gateway/index.ts"
   ],
   "模型回复因长度限制被截断，未能完整生成回答。": [
     "apps/server/src/agent/runtime/index.ts",
@@ -8286,21 +8631,23 @@
     "apps/server/src/utils/singleAgent/index.ts"
   ],
   "供应商目录不能是符号链接或文件": [
-    "apps/server/src/app.ts",
-    "apps/server/src/utils/media/provider.ts"
+    "apps/server/src/utils/media/provider.ts",
+    "apps/server/src/app.ts"
   ],
   "TOONFLOW_SERVER_PORT 必须是 1–65535 之间的整数": [
     "apps/server/src/index.ts"
   ],
   "设备互联启动失败：": [
-    "apps/server/src/index.ts",
-    "apps/desktop/src/connection.ts"
+    "apps/desktop/src/connection.ts",
+    "apps/server/src/index.ts"
   ],
   "账号已变更或未登录，请重新登录": [
-    "apps/server/src/lib/channelRequest.ts"
+    "apps/server/src/lib/channelRequest.ts",
+    "apps/server/src/lib/pluginMarket.ts"
   ],
   "账号已变更，请刷新后重试": [
-    "apps/server/src/lib/channelRequest.ts"
+    "apps/server/src/lib/channelRequest.ts",
+    "apps/server/src/lib/pluginMarket.ts"
   ],
   "此接口仅在桌面客户端中可用": [
     "apps/server/src/lib/desktop.ts"
@@ -8318,7 +8665,8 @@
     "apps/server/src/lib/middleware.ts",
     "apps/server/src/lib/responseFormat.ts",
     "apps/server/src/routes/ai/media/generate.ts",
-    "apps/server/src/routes/ai/media/price.ts"
+    "apps/server/src/routes/ai/media/price.ts",
+    "apps/server/src/routes/plugins/develop.ts"
   ],
   "找不到这个文件或文件夹，可能已被移动、删除，或者位置选错了。": [
     "apps/server/src/lib/responseFormat.ts"
@@ -8433,7 +8781,8 @@
     "apps/server/src/routes/ext/install.ts",
     "apps/server/src/routes/nodes/install.ts",
     "apps/server/src/routes/skills/install.ts",
-    "apps/server/src/routes/tools/install.ts"
+    "apps/server/src/routes/tools/install.ts",
+    "apps/server/src/utils/mcp/operations.ts"
   ],
   "团队已安装": [
     "apps/server/src/routes/agents/install.ts"
@@ -8555,7 +8904,8 @@
   "文件扩展不存在": [
     "apps/server/src/routes/ext/read.ts",
     "apps/server/src/routes/ext/setEnabled.ts",
-    "apps/server/src/routes/ext/uninstall.ts"
+    "apps/server/src/routes/ext/uninstall.ts",
+    "apps/server/src/utils/plugins/ext.ts"
   ],
   "文件扩展已禁用": [
     "apps/server/src/routes/ext/read.ts"
@@ -8571,7 +8921,8 @@
   ],
   "文件扩展状态文件无效": [
     "apps/server/src/routes/ext/setEnabled.ts",
-    "apps/server/src/routes/ext/uninstall.ts"
+    "apps/server/src/routes/ext/uninstall.ts",
+    "apps/server/src/utils/plugins/install.ts"
   ],
   "请在桌面端或服务器本机卸载文件扩展": [
     "apps/server/src/routes/ext/uninstall.ts"
@@ -8795,7 +9146,8 @@
     "apps/server/src/routes/tools/client.ts"
   ],
   "工具不存在": [
-    "apps/server/src/routes/tools/client.ts"
+    "apps/server/src/routes/tools/client.ts",
+    "apps/server/src/utils/plugins/development.ts"
   ],
   "工具界面不存在或版本已更新": [
     "apps/server/src/routes/tools/client.ts"
@@ -8815,7 +9167,8 @@
   "工具文件无效": [
     "apps/server/src/routes/tools/setEnabled.ts",
     "apps/server/src/routes/tools/uninstall.ts",
-    "apps/server/src/utils/plugins/tools.ts"
+    "apps/server/src/utils/plugins/tools.ts",
+    "apps/server/src/utils/plugins/development.ts"
   ],
   "工具状态文件无效": [
     "apps/server/src/routes/tools/setEnabled.ts"
@@ -8920,13 +9273,16 @@
     "apps/server/src/utils/ai/files.ts"
   ],
   "接口值不能包含首尾空白": [
-    "apps/server/src/utils/ai/index.ts"
+    "apps/server/src/utils/ai/index.ts",
+    "apps/server/src/utils/ai/provider.ts"
   ],
   "仅关闭档位可省略接口值": [
-    "apps/server/src/utils/ai/index.ts"
+    "apps/server/src/utils/ai/index.ts",
+    "apps/server/src/utils/ai/provider.ts"
   ],
   "请至少声明一个推理档位": [
-    "apps/server/src/utils/ai/index.ts"
+    "apps/server/src/utils/ai/index.ts",
+    "apps/server/src/utils/ai/provider.ts"
   ],
   "请先在设置中配置模型供应商": [
     "apps/server/src/utils/ai/index.ts"
@@ -8986,7 +9342,10 @@
     "apps/server/src/utils/channel/toonflow.ts"
   ],
   "请先在账号与余额中登录 Toonflow 账号": [
-    "apps/server/src/utils/channel/toonflow.ts"
+    "apps/server/src/utils/channel/toonflow.ts",
+    "apps/web/src/components/settings/toonflowProviderCard.vue",
+    "apps/web/src/components/settings/panels/pluginMarket/marketUpload.ts",
+    "apps/web/src/components/settings/panels/account/rechargeDialog.vue"
   ],
   "账号金额格式不正确": [
     "apps/server/src/utils/channel/toonflow.ts"
@@ -9001,7 +9360,10 @@
     "apps/server/src/utils/channel/toonflow.ts"
   ],
   "请求已取消": [
-    "apps/server/src/utils/channel/toonflow.ts"
+    "apps/server/src/utils/channel/toonflow.ts",
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
   ],
   "Toonflow 请求超时，请重试": [
     "apps/server/src/utils/channel/toonflow.ts"
@@ -9226,7 +9588,8 @@
     "apps/server/src/utils/channel/toonflow.ts"
   ],
   "供应商源码响应格式不正确": [
-    "apps/server/src/utils/channel/toonflow.ts"
+    "apps/server/src/utils/channel/toonflow.ts",
+    "apps/web/src/lib/builtinProviders.ts"
   ],
   "供应商源码不能超过 2 MB": [
     "apps/server/src/utils/channel/toonflow.ts"
@@ -9408,7 +9771,8 @@
     "apps/server/src/utils/mcp/control.ts"
   ],
   "此页面正在执行另一条控制命令，请等待完成": [
-    "apps/server/src/utils/mcp/control.ts"
+    "apps/server/src/utils/mcp/control.ts",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "工作区已切换，请重新调用 getAppState": [
     "apps/server/src/utils/mcp/control.ts"
@@ -9740,11 +10104,9 @@
   "文件正在 Toonflow 中打开，请使用画布或文档工具修改，关闭后再执行文件操作": [
     "apps/server/src/utils/mcp/tools.ts"
   ],
-  "列出连接的 Toonflow 页面及其 connectionId、工作目录、画布、项目列表和节点能力。多个页面时必须用 target.connectionId 明确操作对象；无页面连接时只有显式 target.directory 的服务端工具可用。": [
-    "apps/server/src/utils/mcp/tools.ts"
-  ],
   "请先打开 Toonflow 桌面或网页": [
-    "apps/server/src/utils/mcp/tools.ts"
+    "apps/server/src/utils/mcp/tools.ts",
+    "apps/server/src/utils/plugins/development.ts"
   ],
   "尚未绑定画布": [
     "apps/server/src/utils/mcp/tools.ts"
@@ -9933,13 +10295,17 @@
     "apps/server/src/utils/media/generation.ts"
   ],
   "任务结果文件已被修改，不能覆盖": [
-    "apps/server/src/utils/media/generation.ts"
+    "apps/server/src/utils/media/generation.ts",
+    "apps/server/src/utils/media/tasks.ts"
   ],
   "该任务没有可恢复的供应商凭据，不能重新提交生成": [
     "apps/server/src/utils/media/generation.ts"
   ],
   "此供应商不支持{0}生成": [
     "apps/server/src/utils/media/generation.ts"
+  ],
+  "此供应商可在你的电脑上运行任意命令行程序，能读写文件、联网或调用其他软件。请确认已检查代码，仅在完全信任来源时继续。": [
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
   ],
   "请先在媒体模型设置中配置供应商 API Key": [
     "apps/server/src/utils/media/generation.ts"
@@ -9981,7 +10347,8 @@
     "apps/server/src/utils/media/provider.ts"
   ],
   "模型 ID 不能重复": [
-    "apps/server/src/utils/media/provider.ts"
+    "apps/server/src/utils/media/provider.ts",
+    "packages/providerWeb/providerEditor.vue"
   ],
   "任务恢复数据不能超过 32 层": [
     "apps/server/src/utils/media/provider.ts"
@@ -10029,6 +10396,9 @@
     "apps/server/src/utils/media/provider.ts"
   ],
   "供应商 TypeScript 语法错误：{0}": [
+    "apps/server/src/utils/media/provider.ts"
+  ],
+  "供应商“{0}”包含调用本机命令行（终端）的代码": [
     "apps/server/src/utils/media/provider.ts"
   ],
   "检测到旧版 Toonflow 供应商 TS，无法在 Toonflow 2.0 中使用。请在「添加自定义媒体供应商」中点击「一键复制提示词」，结合旧代码和接口资料重新生成新版代码后再导入。": [
@@ -10148,7 +10518,11 @@
   "只能运行已安装的 Toonflow 账号供应商": [
     "apps/server/src/utils/media/provider.ts"
   ],
+  "只有已安装并确认命令行调用的桌面端供应商才能运行本机命令": [
+    "apps/server/src/utils/media/provider.ts"
+  ],
   "请先登录 Toonflow 账号并刷新供应商": [
+    "apps/server/src/utils/ai/index.ts",
     "apps/server/src/utils/media/provider.ts"
   ],
   "账号媒体供应商 token 无效": [
@@ -10263,7 +10637,8 @@
     "apps/server/src/utils/mobileLink/index.ts"
   ],
   "设备未配对或授权已撤销": [
-    "apps/server/src/utils/mobileLink/index.ts"
+    "apps/server/src/utils/mobileLink/index.ts",
+    "apps/server/src/utils/pluginServer/index.ts"
   ],
   "设备互联配置正在保存，请稍后重试": [
     "apps/server/src/utils/mobileLink/index.ts"
@@ -10391,10 +10766,12 @@
     "apps/server/src/utils/plugins/install.ts"
   ],
   "下载地址格式无效，请提供完整的 HTTP / HTTPS 文件地址": [
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/server/src/lib/pluginMarket.ts"
   ],
   "仅支持不含账号密码的 HTTP / HTTPS 地址": [
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/server/src/utils/mcp/operations.ts"
   ],
   "{0}下载失败：服务器重定向响应缺少 Location 地址": [
     "apps/server/src/utils/plugins/install.ts"
@@ -10484,7 +10861,8 @@
     "apps/server/src/utils/plugins/install.ts"
   ],
   "文件不是兼容的 Toonflow 文件扩展，请使用扩展脚手架构建并保留原文件名": [
-    "apps/server/src/utils/plugins/install.ts"
+    "apps/server/src/utils/plugins/install.ts",
+    "apps/server/src/utils/plugins/ext.ts"
   ],
   "文件扩展脚本语法无效，请重新构建完整的 .umd.js 文件": [
     "apps/server/src/utils/plugins/install.ts"
@@ -10802,6 +11180,9 @@
   ],
   "team.json 无效：{0}": [
     "apps/server/src/utils/teams/files.ts"
+  ],
+  "terminal 参数无效：command 须为首项非空的字符串数组，cwd、stdin 及 env 的值须为字符串，timeout 须为正整数毫秒": [
+    "apps/server/src/utils/media/provider.ts"
   ],
   "团队名称、目录及安装文件名必须一致": [
     "apps/server/src/utils/teams/files.ts"
@@ -11388,5 +11769,1404 @@
   ],
   "FFmpeg 不能操作悬空符号链接": [
     "packages/ffmpeg/src/runtime.ts"
+  ],
+  "官方": [
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
+  ],
+  "已加载": [
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
+  ],
+  "跳转至网页查看": [
+    "apps/web/src/components/settings/toonflowProviderCard.vue"
+  ],
+  "该项目没有成功构建的产物，请先执行 build": [
+    "apps/server/src/utils/plugins/development.ts"
+  ],
+  "构建产物已被修改，请重新构建": [
+    "apps/server/src/utils/plugins/development.ts",
+    "apps/server/src/routes/plugins/develop.ts"
+  ],
+  "确认安装": [
+    "apps/web/src/components/agent/marketInstallApproval.vue",
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
+  ],
+  "插件可能执行代码并访问本地文件，请仅安装信任来源的插件。": [
+    "apps/web/src/lib/pluginInstallConfirmation.ts"
+  ],
+  "请在桌面端或服务器本机确认安装插件": [
+    "apps/server/src/utils/mcp/tools.ts",
+    "apps/server/src/routes/plugins/develop.ts"
+  ],
+  "列出连接的 Toonflow 页面及其 connectionId、工作目录、画布、项目列表和节点能力。控制多个页面时用 target.connectionId 明确操作对象。市场搜索无需连接页面，服务端工作区工具可显式指定 target.directory。": [
+    "apps/server/src/utils/mcp/tools.ts"
+  ],
+  "搜索 Toonflow 插件市场，返回可用于申请安装的插件 ID。": [
+    "apps/server/src/utils/mcp/tools.ts"
+  ],
+  "按市场插件 ID 向目标 Toonflow 页面请求安装，用户允许后下载并安装。": [
+    "apps/server/src/utils/mcp/tools.ts"
+  ],
+  "团队项目": [
+    "apps/web/src/pages/home/pages/projects/index.vue"
+  ],
+  "进入超管后台": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+  ],
+  "超级管理员密码": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "开启多租户": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "请在服务端本机设置超级管理员密码": [],
+  "读取多租户状态失败": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "密码长度应为 8 到 128 个字符": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "保存多租户设置失败": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "超管后台": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "返回应用": [],
+  "多租户数据库尚未初始化": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "超级管理员密码已设置，请登录管理后台": [],
+  "超级管理员密码保存失败": [],
+  "请先设置超级管理员密码": [],
+  "尝试次数过多，请稍后重试": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "超级管理员密码错误": [],
+  "请先登录多租户管理后台": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "管理会话已失效，请重新登录": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "多租户数据目录必须是普通目录": [
+    "packages/multiTenant/db/index.ts",
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "多租户数据源配置文件无效": [
+    "packages/multiTenant/db/index.ts",
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "多租户数据源配置无效，请检查配置文件": [
+    "packages/multiTenant/db/index.ts"
+  ],
+  "SQLite 数据库必须位于多租户数据目录内": [
+    "packages/multiTenant/db/index.ts"
+  ],
+  "SQLite 数据库必须是普通文件": [
+    "packages/multiTenant/db/index.ts"
+  ],
+  "多租户数据源访问失败，请检查配置与数据库状态": [
+    "apps/server/src/utils/multiTenant/index.ts"
+  ],
+  "请在宿主本机页面首次设置超级管理员密码": [],
+  "请输入超级管理员密码": [],
+  "验证超级管理员": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+  ],
+  "超级管理员账号": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "请在服务端本机设置超级管理员账号和密码": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+  ],
+  "账号长度应为 1 到 64 个字符": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "账号不能包含空白或控制字符": [
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "超级管理员账号已设置，请登录管理后台": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "超级管理员账号保存失败": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "请先设置超级管理员账号": [
+    "packages/multiTenant/auth/index.ts",
+    "packages/multiTenant/models/index.ts",
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "超级管理员账号或密码错误": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "请在宿主本机页面首次设置超级管理员账号和密码": [
+    "apps/server/src/utils/multiTenant/index.ts"
+  ],
+  "自定义请求头": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请求头名称": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请求头值（可留空）": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请求头值": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "删除请求头": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "添加请求头": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请输入请求头名称": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请求头名称只能包含字母、数字和 HTTP 标记字符": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请求头名称不能重复（不区分大小写）": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/server/src/utils/ai/provider.ts"
+  ],
+  "请求头值不能包含控制字符、换行或非 Latin1 字符": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue"
+  ],
+  "请求头名称无效": [
+    "apps/server/src/utils/ai/provider.ts"
+  ],
+  "请求头值包含无效字符": [
+    "apps/server/src/utils/ai/provider.ts"
+  ],
+  "打开创作 Web": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "账号": [
+    "apps/web/src/components/settings/index.vue",
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "注册账号": [
+    "packages/multiTenant/userWeb/index.vue"
+  ],
+  "返回登录": [
+    "packages/multiTenant/userWeb/index.vue"
+  ],
+  "账号操作失败，请重试": [
+    "packages/multiTenant/userWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "账号已存在，请使用其他账号": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "账号或密码错误": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "账号不存在": [
+    "packages/multiTenant/auth/index.ts",
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "设置内容过大": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "设置已更新，请重新读取后保存": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "多租户尚未开启": [
+    "apps/server/src/utils/multiTenant/index.ts",
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "只允许 Toonflow 页面访问账号接口": [
+    "apps/server/src/utils/multiTenant/index.ts"
+  ],
+  "创作入口不能访问主机管理接口": [
+    "apps/server/src/utils/multiTenant/index.ts",
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "主机身份凭据无效": [
+    "apps/server/src/utils/multiTenant/index.ts"
+  ],
+  "主机身份验证失败": [
+    "apps/server/src/utils/multiTenant/index.ts"
+  ],
+  "多租户服务尚未初始化": [
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "无法监听多租户端口 10888，请检查端口占用": [
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "多租户服务尚未启动": [
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "请先登录 Toonflow": [
+    "apps/server/src/utils/workspace/index.ts",
+    "apps/server/src/utils/multiTenant/runtime.ts",
+    "apps/server/src/utils/multiTenant/billing.ts",
+    "apps/server/src/utils/multiTenant/management.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/agent/runtime/model.ts",
+    "apps/server/src/agent/tools/index.ts",
+    "apps/server/src/utils/media/tasks.ts",
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "当前账号尚未开放此功能": [
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "账号工作区身份无效": [
+    "apps/server/src/utils/workspace/index.ts"
+  ],
+  "工作区目录不能是符号链接": [],
+  "只能访问当前账号的工作区": [
+    "apps/server/src/utils/workspace/index.ts"
+  ],
+  "退出登录失败，请重试": [
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "工作区目录必须是普通目录": [
+    "apps/server/src/utils/workspace/index.ts"
+  ],
+  "请求路径无效": [
+    "apps/server/src/utils/multiTenant/runtime.ts"
+  ],
+  "超级管理员": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue"
+  ],
+  "登录超级管理员账号，管理多租户服务。": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "管理当前服务的访问方式与创作入口。": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "多租户服务": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "未开启": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "apps/web/src/components/settings/panels/multiTenant/index.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "开启后，用户登录后即可访问创作 Web。": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "访问端口": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "后台导航": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "关闭服务不会删除账号、项目或设置。": [
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "创作入口": [
+    "packages/multiTenant/adminWeb/pages/configuration.vue",
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "前往配置": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "通过此地址登录或注册 Toonflow。": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "账号与数据": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "用户可注册独立账号，登录后进入创作 Web。": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "项目与设置": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "普通账号的项目与设置彼此独立，超级管理员可访问原有项目。": [
+    "packages/multiTenant/adminWeb/pages/overview.vue"
+  ],
+  "用户管理": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "新增账号": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "读取用户列表失败": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "暂无用户": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "最近登录": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "禁用": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "重置密码后，该账号需要重新登录。": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "未记录": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "密码已重置": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "账号已创建": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "确定禁用账号“{0}”？": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "确定启用账号“{0}”？": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "账号已禁用": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/auth/index.ts",
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "账号已启用": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "账号状态已变更，请重新登录": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "允许注册": [
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "关闭后，新用户需由管理员创建账号，已有账号仍可登录。": [
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "当前已关闭注册，请联系管理员创建账号": [
+    "packages/multiTenant/auth/index.ts"
+  ],
+  "数据源映射": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "为业务能力选择由多租户后端处理，或经后端转发至 Toonflow 云端。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "当前仅保存配置草稿，不会改变现有请求。模型路由、代理执行与价格计算将在后续接入。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "多租户后端处理": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "Toonflow 云端": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "模型目录与可用模型信息。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "供应商来源": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "文本与媒体供应商来源。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "插件目录与市场数据。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "社区内容": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "作品、广告与赞助等社区内容。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "保存草稿": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "读取数据源映射失败": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "重新加载会放弃未保存的映射修改，是否继续？": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "映射草稿已保存": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "保存数据源映射失败": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "数据源映射配置无效，请检查数据库记录": [
+    "packages/multiTenant/sourceMapping/index.ts"
+  ],
+  "数据源映射已被更新，请重新加载后再保存": [
+    "packages/multiTenant/sourceMapping/index.ts"
+  ],
+  "钱包金额必须是安全范围内的非负整数": [
+    "packages/multiTenant/db/billing.ts"
+  ],
+  "钱包账本状态不一致，请联系管理员": [
+    "packages/multiTenant/db/billing.ts"
+  ],
+  "钱包余额超过安全范围": [
+    "packages/multiTenant/db/billing.ts"
+  ],
+  "结算金额不能超过预占金额": [
+    "packages/multiTenant/db/billing.ts"
+  ],
+  "账单数量必须为 1 到 100": [
+    "packages/multiTenant/db/sqlite.ts"
+  ],
+  "钱包数据表尚未初始化或存储引擎不支持事务": [
+    "packages/multiTenant/db/mysql.ts"
+  ],
+  "余额不足": [
+    "packages/multiTenant/db/mysql.ts"
+  ],
+  "模型与价格": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "统一管理模型路由、用户售价与平台上游成本。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "新增模型路由": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "普通用户按平台售价扣除余额，平台上游成本独立记录。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "Toonflow 云端凭据": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "已配置": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "未配置": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "使用平台专用云端凭据同步上游模型，凭据不会返回创作端。": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "云端访问令牌": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "保存并同步云端": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "留空时沿用已保存的云端凭据。": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "读取模型路由失败": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "暂无模型路由": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "类型": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "处理方式": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "上游模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "用户售价": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "上游成本": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "编辑模型路由": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "模型名称": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "当前没有可用的上游模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "当前没有可用的上游模型，请先配置后端供应商或同步云端模型。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "所选上游模型已不可用，请重新选择。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "启用模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "记录上游成本": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "计价方式": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "币种": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "金额": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "输入价格（每百万 Token）": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "输出价格（每百万 Token）": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "缓存读取价格（每百万 Token）": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "缓存写入价格（每百万 Token）": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue"
+  ],
+  "每百万 Token": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "每秒": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "每次请求": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/components/priceEditor.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "读取上游模型失败": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "重新加载会放弃当前编辑，是否继续？": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "云端模型已同步": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "同步云端模型失败": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "请检查模型名称、上游选择和价格格式，价格最多支持 6 位小数。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "模型路由已保存": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "保存模型路由失败": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "余额": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue",
+    "apps/web/src/pages/home/homeAccount.vue"
+  ],
+  "账户余额": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "apps/web/src/pages/workspace/panels/canvas/components/toonflowBalance.vue"
+  ],
+  "已预占": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "可用余额": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "增加余额": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "备注": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "最近 20 笔账目": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "暂无账目": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "时间": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "模型扣费": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "待结算": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "重试增加余额": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "已结算": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "已释放": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "读取余额失败，请重试": [
+    "packages/multiTenant/adminWeb/pages/users.vue",
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "金额须大于 0，最多 6 位小数且不超过 1000000000": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "余额已增加": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "增加余额失败，请重试": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "本页保存业务来源草稿；模型请求使用“模型与价格”中的已启用路由，其他业务来源暂不切换。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "最近账目": [
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "模型调用": [
+    "packages/multiTenant/userWeb/account.vue"
+  ],
+  "模型价格不能超过 1000000000": [
+    "packages/multiTenant/models/config.ts"
+  ],
+  "文本模型须按百万 Token 计价，图片与音频须按次计价，视频可按次或按秒计价": [
+    "packages/multiTenant/models/config.ts"
+  ],
+  "模型路由 ID 不能重复": [
+    "packages/multiTenant/models/config.ts"
+  ],
+  "模型路由配置无效，请检查数据库记录": [
+    "packages/multiTenant/models/index.ts"
+  ],
+  "模型路由已被更新，请重新加载后再保存": [
+    "packages/multiTenant/models/index.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "不能移除已有模型路由，请改为停用": [
+    "packages/multiTenant/models/index.ts"
+  ],
+  "模型计价参数无效": [
+    "packages/multiTenant/models/pricing.ts"
+  ],
+  "模型加密密钥无效，必须为 32 字节 Base64": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "多租户数据目录尚未初始化": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "MySQL 部署必须配置 TOONFLOW_MULTI_TENANT_SECRET": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型加密密钥文件缺失，请恢复原密钥": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型加密密钥文件无效": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型加密密钥文件权限必须为 0600": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型执行配置不能超过 8 MB": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型加密配置无效，请检查原始记录与密钥": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "模型加密配置无法解密，请检查原始记录与密钥": [
+    "packages/multiTenant/models/secret.ts"
+  ],
+  "充值金额必须大于 0": [
+    "packages/multiTenant/billing/config.ts"
+  ],
+  "计费金额无效": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费金额超出可处理范围": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费记录无效，请联系管理员": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "余额记录无效，请联系管理员": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费记录尚未结算": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费数据源尚未初始化，请联系管理员": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费记录归属不一致，请联系管理员": [
+    "packages/multiTenant/billing/index.ts",
+    "apps/server/src/utils/multiTenant/billing.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "计费记录不存在": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "无权操作此计费记录": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "请求标识已被其他操作使用": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "模型路由已停用": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "无法确定本次请求的计费用量": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "余额不足，请联系管理员充值": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费请求与原预占记录不一致": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "请求已处理，请勿重复提交": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "无法确定本次请求的实际计费用量": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "计费状态发生冲突，请联系管理员": [
+    "packages/multiTenant/billing/index.ts"
+  ],
+  "模型账务处理失败，请联系管理员": [
+    "apps/server/src/utils/multiTenant/billing.ts",
+    "apps/server/src/routes/ai/generate.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/agent/runtime/requests.ts"
+  ],
+  "请选择已发布的平台模型": [
+    "apps/server/src/utils/multiTenant/billing.ts",
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "模型类型与计价方式不匹配": [
+    "apps/server/src/utils/multiTenant/billing.ts"
+  ],
+  "媒体任务路由快照无效": [
+    "apps/server/src/utils/multiTenant/billing.ts",
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "该模型需要可确定的计费时长": [
+    "apps/server/src/utils/multiTenant/billing.ts"
+  ],
+  "启用的模型路由必须绑定可用的上游模型": [
+    "apps/server/src/utils/multiTenant/management.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "模型路由配置访问失败": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "次": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "秒": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "多租户模型路由尚未开启": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/media/tasks.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "请先配置平台 Toonflow 云端凭据": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "平台 Toonflow 云端配置无效": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "平台模型不存在或已停用": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "平台模型上游配置无效": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "平台模型上游不存在": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "平台模型不能使用个人云端凭据": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts",
+    "apps/server/src/utils/multiTenant/providerAdapters.ts"
+  ],
+  "平台模型能力配置无效": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "请先填写生成时长再查询价格": [
+    "apps/server/src/utils/multiTenant/models.ts"
+  ],
+  "当前模型暂时无法报价": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "平台售价，按实际用量结算": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/media/generation.ts"
+  ],
+  "平台 Toonflow 云端配置获取失败": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "packages/multiTenant/gateway/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "兼容预览临时目录超出系统临时目录，已停止清理": [
+    "apps/server/src/utils/media/preview.ts"
+  ],
+  "媒体生成失败": [
+    "apps/server/src/utils/media/provider.ts",
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "只能访问当前账号的媒体任务": [
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "媒体任务扣费记录无效": [
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "无法确定生成媒体的计费时长，请重试或取消任务": [
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "取消媒体任务失败": [
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "模型请求失败，请稍后重试": [
+    "apps/server/src/utils/ai/index.ts",
+    "apps/server/src/routes/ai/generate.ts",
+    "apps/server/src/agent/runtime/requests.ts"
+  ],
+  "模型运行时初始化失败": [
+    "apps/server/src/agent/runtime/model.ts"
+  ],
+  "模型路由与当前运行时不匹配": [
+    "apps/server/src/agent/runtime/requests.ts"
+  ],
+  "释放预占": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "释放后本次请求不再扣费，仍在进行的上游调用费用由平台承担。": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "释放原因": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "请输入 1 到 256 个字符的释放原因": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "预占已释放": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "该预占已结束，请查看最新账目": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "释放预占失败，请重试": [
+    "packages/multiTenant/adminWeb/pages/users.vue"
+  ],
+  "媒体任务扣费状态已变更，不能重新提交": [
+    "apps/server/src/utils/media/tasks.ts"
+  ],
+  "模型用量事件超过读取限制": [
+    "apps/server/src/utils/ai/billingUsage.ts"
+  ],
+  "模型用量响应超过读取限制": [
+    "apps/server/src/utils/ai/billingUsage.ts"
+  ],
+  "Responses 模型的输出上限不能低于 16 Token": [
+    "apps/server/src/utils/ai/index.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "模型参数不在平台允许的范围内": [
+    "apps/server/src/utils/multiTenant/models.ts",
+    "apps/server/src/utils/multiTenant/modelAdapters.ts"
+  ],
+  "对外模型 ID 须为 1 到 128 个字符，以字母或数字开头，仅支持字母、数字、点、下划线、冒号和短横线": [
+    "packages/multiTenant/models/config.ts"
+  ],
+  "对外模型 ID 不能重复，也不能与其他路由的内部 ID 相同": [
+    "packages/multiTenant/models/config.ts"
+  ],
+  "供应商 ID 不能重复": [
+    "packages/multiTenant/models/config.ts",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "供应商配置无效，请检查后重试": [
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "平台供应商配置读取失败，请联系管理员": [
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "不能移除已有供应商，请保留供应商 ID": [
+    "packages/multiTenant/gateway/index.ts"
+  ],
+  "模型服务": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "供应商管理": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "模型路由": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "价格配置": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "平台设置": [
+    "packages/multiTenant/adminWeb/index.vue"
+  ],
+  "系统配置": [
+    "packages/multiTenant/adminWeb/index.vue",
+    "packages/multiTenant/adminWeb/pages/configuration.vue"
+  ],
+  "创作端使用对外模型 ID 请求，由平台路由到指定供应商模型。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "模型服务配置": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "管理供应商": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "配置售价与成本": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "对外模型 ID": [
+    "packages/multiTenant/adminWeb/pages/models.vue",
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "处理来源": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "实际上游模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "对外模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "上游映射": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "第三方供应商": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "当前没有可用的供应商": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "路由映射": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "初始价格": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "售价与成本在价格配置中维护，修改映射不会改变当前价格。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "请检查对外模型 ID、名称、上游绑定和价格格式，价格最多支持 6 位小数。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "按对外模型配置用户售价与上游成本，路由映射在模型路由中维护。": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "读取模型价格失败": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "编辑价格": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "请检查价格格式，价格最多支持 6 位小数。": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "模型价格已保存": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "保存模型价格失败": [
+    "packages/multiTenant/adminWeb/pages/prices.vue"
+  ],
+  "配置模型连接与上游能力，再由模型路由发布给创作端。": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "文本供应商": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "媒体供应商": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "暂无供应商": [
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "配置来源": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "TypeScript 供应商": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "读取供应商配置失败": [
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "解析供应商失败": [
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "不能修改已有供应商的 ID": [
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "供应商配置已变更，请重新加载": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "供应商配置已保存": [
+    "packages/multiTenant/adminWeb/pages/providers.vue"
+  ],
+  "保存供应商失败": [
+    "packages/multiTenant/adminWeb/pages/providers.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "本页保存其他业务来源草稿；模型请求使用“模型路由”中的已启用映射。": [
+    "packages/multiTenant/adminWeb/pages/sourceMapping.vue"
+  ],
+  "配置方式": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "内置供应商": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue",
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "自定义供应商": [
+    "apps/web/src/components/settings/panels/languageModel/addCustomProviderDialog.vue",
+    "apps/web/src/components/settings/panels/mediaModel/addCustomProviderDialog.vue"
+  ],
+  "复用现有 TypeScript 供应商格式，解析后配置连接与上游模型。": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "解析供应商": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "供应商 ID": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "接口地址": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "接口协议": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "最大输出 Token": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "手动配置": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "内置预设": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请选择不超过 2 MB 的 TypeScript 供应商文件": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请求头必须是 JSON 对象": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请先解析修改后的供应商代码": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请填写供应商 ID 和显示名称": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "请填写接口地址": [
+    "packages/providerWeb/providerEditor.vue"
+  ],
+  "供应商源码不能为空": [
+    "apps/server/src/utils/multiTenant/providerAdapters.ts"
+  ],
+  "供应商 ID 与代码不一致": [
+    "apps/server/src/utils/multiTenant/providerAdapters.ts"
+  ],
+  "文本供应商配置无效": [
+    "apps/server/src/utils/multiTenant/providerAdapters.ts",
+    "apps/server/src/utils/media/provider.ts"
+  ],
+  "文本供应商只能包含文本模型": [
+    "apps/server/src/utils/media/provider.ts"
+  ],
+  "创作端模型统一经过多租户后端，转发到指定模型。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "创作端模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "平台转发目标": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "转发关系": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "创作端模型 ID": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "多租户后端": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "实际请求模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "创作端显示名称": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "启用路由": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "目标来源": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "目标供应商": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "当前没有可用模型": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "所选模型已不可用，请重新选择。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "当前没有可用模型，请先配置供应商或同步云端模型。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "修改转发目标不影响售价与成本。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "读取可用模型失败": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "请检查创作端模型 ID、显示名称、转发目标和价格格式，价格最多支持 6 位小数。": [
+    "packages/multiTenant/adminWeb/pages/models.vue"
+  ],
+  "多租户模式下只能使用已发布的平台模型": [
+    "apps/server/src/utils/multiTenant/gateway.ts"
+  ],
+  "多租户媒体生成必须通过持久任务提交": [
+    "apps/server/src/utils/media/generation.ts"
+  ],
+  "当前模式不允许切换设备连接": [
+    "apps/server/src/remoteConnection.ts"
+  ],
+  "多租户主机模式下不能连接其他设备": [
+    "apps/desktop/src/connection.ts"
+  ],
+  "请通过端口 10888 访问创作功能": [
+    "apps/server/src/utils/multiTenant/runtime.ts",
+    "apps/server/src/utils/mobileLink/index.ts"
+  ],
+  "发现小补丁更新": [
+    "apps/web/src/components/settings/panels/about/index.vue"
+  ],
+  "这是同版本的小补丁更新，版本号保持不变。": [
+    "apps/web/src/components/settings/panels/about/index.vue"
+  ],
+  "未登录": [
+    "apps/web/src/pages/home/homeAccount.vue"
+  ],
+  "新版": [
+    "apps/web/src/pages/home/homeAccount.vue"
+  ],
+  "登录 Toonflow 后即可使用官方模型，无需手动配置 API Key。": [
+    "apps/web/src/components/modelLoginGuide.vue"
+  ],
+  "前往登录": [
+    "apps/web/src/components/modelLoginGuide.vue"
+  ],
+  "供应商列表格式不正确": [
+    "apps/web/src/lib/builtinProviders.ts"
+  ],
+  "获取供应商列表失败": [
+    "apps/web/src/lib/builtinProviders.ts"
+  ],
+  "供应商类型无效": [
+    "apps/server/src/utils/channel/toonflow.ts"
+  ],
+  "供应商列表响应格式不正确": [
+    "apps/server/src/utils/channel/toonflow.ts"
+  ],
+  "供应商参数无效": [
+    "apps/server/src/utils/channel/toonflow.ts"
+  ],
+  "供应商源码 ID 与所选供应商不一致或使用了账号保留 ID": [
+    "apps/server/src/utils/media/builtin.ts"
+  ],
+  "文件名需为小驼峰格式，例如 image.ext.js": [
+    "apps/server/src/utils/plugins/install.ts"
+  ],
+  "文件扩展脚本语法无效，请重新构建完整的 .ext.js 文件": [
+    "apps/server/src/utils/plugins/ext.ts"
+  ],
+  "选择扩展脚手架打包的 .ext.js 文件。": [
+    "apps/web/src/components/settings/panels/developer/index.vue"
+  ],
+  "不支持这个安装文件。支持的格式：文件扩展 .ext.js；Agent .agent.zip；节点 .umd.js；工具 .tool.js；技能 .zip、.md、.tar、.tar.gz、.tgz。": [
+    "apps/web/src/components/settings/panels/pluginMarket/index.vue"
+  ],
+  "插件服务连接超时": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务连接失败（{0}）": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务连接已断开，请重新启动服务": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务消息超过大小限制": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务发送队列已满": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务连接已失效": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "页面已离开，插件服务连接已关闭": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "创作页面已关闭": [
+    "apps/web/src/lib/pluginServer.ts"
+  ],
+  "插件服务尚未初始化": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接数量超过限制": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接已关闭": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "运行模式已变化，请重新连接插件服务": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接缓冲已满": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接凭据无效": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接已存在": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务事件连接尚未就绪": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务注册请求重复": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务数量超过限制": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务路由重复": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务启动失败": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务不存在": [
+    "apps/server/src/utils/pluginServer/index.ts",
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务消息超过 1 MB": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务连接已关闭或缓冲已满": [
+    "apps/server/src/utils/pluginServer/index.ts"
+  ],
+  "插件服务请求过于频繁": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务不存在或访问凭据无效": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务不能注册 Service Worker": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务请求参数过长": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务端口必须是 0–65535 之间的整数": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "插件服务公网地址必须是不含路径和凭据的 HTTP 或 HTTPS 根地址": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
+  ],
+  "HTTPS 部署请配置 TOONFLOW_PLUGIN_SERVER_URL 与插件服务反向代理": [
+    "apps/server/src/utils/pluginServer/gateway.ts"
   ]
 }

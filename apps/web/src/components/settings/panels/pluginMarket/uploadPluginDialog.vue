@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="版本号" required>
-        <el-input v-model="form.version" :maxlength="128" autocomplete="off" placeholder="例如 1.0.0" />
+        <el-input v-model="form.version" :readonly="!!pluginFile" :maxlength="128" autocomplete="off" placeholder="例如 1.0.0" />
       </el-form-item>
       <el-form-item label="描述">
         <el-input v-model="form.desc" type="textarea" :rows="3" :maxlength="20000" resize="none" />
@@ -69,7 +69,7 @@ import videoPlayer from "@/components/videoPlayer.vue";
 import type { PluginUploadSignature } from "@toonflow/server/channel";
 import type { Plugin, PluginType } from "./types";
 
-const props = defineProps<{ plugin?: Plugin; marketPlugin?: Plugin; token: string }>();
+const props = defineProps<{ plugin?: Plugin; pluginFile?: File; marketPlugin?: Plugin; token: string }>();
 const emit = defineEmits<{ uploaded: []; closed: [] }>();
 const visible = ref(true);
 const formId = useId();
@@ -82,7 +82,7 @@ const typeOptions: { label: string; value: PluginType }[] = [
   { label: "节点", value: "node" }, { label: "文件扩展", value: "ext" }, { label: "技能", value: "skill" },
   { label: "工具", value: "tool" }, { label: "Agent", value: "agent" },
 ];
-const canLoadLocalFile = computed(() => !!props.plugin && (!props.marketPlugin
+const canLoadLocalFile = computed(() => !!props.plugin && !props.pluginFile && (!props.marketPlugin
   || (props.plugin.name === props.marketPlugin.name && props.plugin.type === props.marketPlugin.type)));
 const fileName = ref("");
 const fileInput = ref<HTMLInputElement>();
@@ -95,7 +95,7 @@ const mediaKind = computed(() => form.type === "skill" ? "video" : form.type ===
 const mediaLabel = computed(() => mediaKind.value === "video" ? "Skill 效果演示视频" : "节点截图封面");
 const existingMediaUrl = computed(() => mediaKind.value === "video" ? props.marketPlugin?.demoVideoUrl : mediaKind.value === "cover" ? props.marketPlugin?.coverUrl : undefined);
 const mediaPreview = computed(() => mediaObjectUrl.value || existingMediaUrl.value || "");
-const fileExtension = computed(() => form.type === "skill" || form.type === "agent" ? ".zip" : ".js");
+const fileExtension = computed(() => form.type === "skill" || form.type === "agent" ? ".zip" : form.type === "ext" ? ".ext.js" : ".js");
 const maxFileMegabytes = computed(() => fileExtension.value === ".zip" ? 20 : 10);
 const loadingFile = ref(false);
 const uploading = ref(false);
@@ -117,13 +117,20 @@ let controller: AbortController | undefined;
 let fileReader: FileReader | undefined;
 
 async function loadFile() {
-  const plugin = props.plugin;
-  if (!visible.value || uploading.value || !plugin || !canLoadLocalFile.value) return;
+  const { plugin, pluginFile } = props;
+  if (!visible.value || uploading.value || !plugin) return;
+  if (pluginFile) {
+    fileName.value = pluginFile.name;
+    fileError.value = validateFile(pluginFile, pluginFile.name);
+    file.value = fileError.value ? undefined : pluginFile;
+    return;
+  }
+  if (!canLoadLocalFile.value) return;
   controller?.abort();
   const request = new AbortController();
   controller = request;
   file.value = undefined;
-  fileName.value = `${plugin.name}.${plugin.type === "node" || plugin.type === "ext" ? "umd.js" : plugin.type === "tool" ? "tool.js" : plugin.type === "agent" ? "agent.zip" : "zip"}`;
+  fileName.value = plugin.type === "ext" ? `${plugin.name.slice(4)}.ext.js` : `${plugin.name}.${plugin.type === "node" ? "umd.js" : plugin.type === "tool" ? "tool.js" : plugin.type === "agent" ? "agent.zip" : "zip"}`;
   loadingFile.value = true;
   fileError.value = "";
   uploadError.value = "";
@@ -266,7 +273,7 @@ function selectMedia(event: Event) {
 }
 
 watch(visible, value => { if (!value) cancelRequests(); }, { flush: "sync" });
-watch(() => [props.token, props.plugin?.key, props.marketPlugin?.key], () => { visible.value = false; }, { flush: "sync" });
+watch(() => [props.token, props.plugin?.key, props.pluginFile, props.marketPlugin?.key], () => { visible.value = false; }, { flush: "sync" });
 watch(() => form.type, () => {
   if (props.plugin || props.marketPlugin) return;
   clearMedia();
