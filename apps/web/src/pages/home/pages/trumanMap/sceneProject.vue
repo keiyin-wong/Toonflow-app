@@ -63,6 +63,12 @@ provide("workspaceFiles", () => {
   if (!files) throw new Error("请先选择工作目录");
   return files;
 });
+// 单独打开的场景没有画布：把最近的 Toonflow 项目交给白模预演的 Agent，让它自己读各项目画布上的剧本（只读）。
+provide("storyWorkspaces", () => [...workspaceStore.projectList]
+  .filter(item => item.directory !== directory)
+  .sort((a, b) => b.lastOpenedAt - a.lastOpenedAt)
+  .slice(0, 20)
+  .map(item => ({ name: item.name, files: useWorkspaceFiles(item.directory) })));
 provide("workspaceDirectory", () => {
   if (!directory) throw new Error("请先选择工作目录");
   return directory;

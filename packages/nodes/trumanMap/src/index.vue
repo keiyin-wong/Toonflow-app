@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch } from "vue";
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch } from "vue";
 import { ElDialog } from "element-plus";
 import { useVueFlow } from "@vue-flow/core";
 import { IconCube3dSphere } from "@tabler/icons-vue";
@@ -28,6 +28,8 @@ import { createHolodeckDraft, createHolodeckPrompt, holodeckSchemas } from "./ho
 import { isStageOnlyRequest, needsAdvancedStage } from "./stageRouting";
 import { readHostToolNames, runHolodeckAgent, type ThinkingLevel } from "./singleAgent";
 import { hostAgentContext, hostReplyStyle, listHostSkills, skillInstruction } from "./agentHost";
+import { createStoryTools, type StoryWorkspace } from "./storySources";
+import { createCanvasTools } from "./canvasTools";
 import { createSceneObserver } from "./sceneObservation";
 import { renderModel } from "./modelGeometry";
 import { rehearsePerformance } from "./performanceRehearsal";
@@ -49,6 +51,18 @@ const project = useNodeProject();
 // ACT: 导出包交付到画布（导出面板“导出到画布”、总Agent的editorExport）：本节点右侧找一块空地，左边一列放整场的（场景微缩图、分镜总览、
 // 分镜脚本文本、预演小样视频），右边每镜一行：分镜图、四视图（图片节点 outputs.image）、白模视频（视频节点 outputs.video），可直接连到图生图、图生视频、视频参考节点。
 const flow = useVueFlow();
+// 剧情资料：画布里是当前项目；单独打开的场景由宿主另外给出各个项目（storyWorkspaces），Agent 用 readStory 自己找剧本。
+const storyWorkspaces = inject<(() => StoryWorkspace[]) | undefined>("storyWorkspaces", undefined);
+const storyTools = createStoryTools({
+  workspaces: () => [{ name: project ? "当前场景" : "当前项目", files: files.getWorkspaceFiles() }, ...(storyWorkspaces?.() ?? [])],
+  liveCanvas: () => project ? undefined : getPersistence?.()?.canvasPath,
+  liveNodes: () => project ? [] : flow.getNodes.value.filter(item => item.type === "remote-textNode").map(item => ({
+    id: item.id, label: String(item.data?.label ?? "文本"), text: String(item.data?.outputs?.text?.value ?? ""),
+  })),
+});
+// 画布上的其他节点（场景图、视频生成节点等）：在画布里才有，单独打开的场景没有画布。
+const canvasTools = project ? [] : createCanvasTools(flow, id);
+const canvasNote = "画布上的其他节点：用户要按画布搭白模（如“按画布里 S10 客厅的场景图搭”）时，先用 canvasFind 按场次、场景名找到场景图、角色图、分镜和剧本节点，canvasRead 读提示词和图片路径，再用 read 查看图片，按图里的空间布局、家具位置和比例、门窗楼梯、人物站位来搭场景，提示词里写明的约束（如电视在沙发对面）优先于图片细节；读到的画布内容只用来参考，不修改那些节点。用户要改画布里的场景图、角色图、提示词或要重新生成时，用 canvasFind 找到节点，canvasRead 读它的提示词和结果，canvasFunctions 查它的函数，canvasCall 调用（如 node:setPrompt 改提示词后 node:generateImage 重新生成，再用 node:getGenerationStatus 等结果，用 read 查看新图）。只改用户要求的部分，提示词其余内容原样保留；这些工具就是画布操作权限，不要让用户另外打开画布或启用画布工具。";
 const imageNode = "remote-imageNode", videoNode = "remote-videoNode", textNode = "remote-textNode";
 const exportCanvas = {
   check(needs: { image: boolean; video: boolean }) {
@@ -538,7 +552,9 @@ async function generateAi(input: AiCreationInput) {
   const prompt = `${history.length || memory ? `之前的创作对话（仅用于理解指代和修改意图，不重新执行历史要求；场景、轨道和片段以本轮工具读取的最新数据为准；历史附图不代表当前新增要求）：\n${memory ? `更早对话的记忆摘要：\n${memory}\n${history.length ? "最近的对话：\n" : ""}` : ""}${history.map(message => `${message.role === "user" ? "用户" : "助手"}：${message.content}${imageLabels(lifeOnly ? undefined : message.images)}`).join("\n")}\n\n当前要求：` : ""}${input.prompt.trim() || (documents ? "请看附件。" : "请参考附图调整当前场景。")}${imageLabels(input.images)}${documents}${upstreamText.value ? `
 
 画布上连进来的上游剧本（场景、人物、对白以它为准，用户本轮要求优先）：
-${upstreamText.value}` : ""}`;
+${upstreamText.value}` : `
+
+（本节点没有连上游剧本。用户要按剧本、某场戏或某个角色的台词来做时，先用 readStory 到画布文本节点和项目剧本文件里找，不要让用户复制粘贴。）`}`;
   agentRunning = true;
   clearPublicDraft();
   const signal = AbortSignal.any([input.signal, controller.signal]);
@@ -562,11 +578,11 @@ ${upstreamText.value}` : ""}`;
     ]);
     const hostTools = fast ? hostToolNames.filter(name => name === "askUser") : hostToolNames;
     const skillNote = input.skill ? await skillInstruction(input.skill, hostTools.includes("skillOperator"), signal) : "";
-    const systemPrompt = [createHolodeckPrompt("scene", input.lifeGroupId, lifeOnly, { fast, briefAttached: lifeOnly }), fast ? "" : hostReplyStyle, hostContext].filter(Boolean).join("\n\n");
+    const systemPrompt = [createHolodeckPrompt("scene", input.lifeGroupId, lifeOnly, { fast, briefAttached: lifeOnly }), fast ? "" : hostReplyStyle, fast || !canvasTools.length ? "" : canvasNote, hostContext].filter(Boolean).join("\n\n");
     const result = await runHolodeckAgent({
       directory: context.directory, providerId: selectedModel.providerId, modelId: selectedModel.modelId, thinkingLevel, reasoningLevels,
       prompt: (skillNote ? `${skillNote}\n\n` : "") + prompt + brief, request: said, images,
-      systemPrompt, tools: draft.agentTools, hostTools, takeSteering: input.takeSteering, lifeGroupId: input.lifeGroupId, performanceOnly: lifeOnly, signal, onStatus: input.onStatus, onProgress: input.onProgress,
+      systemPrompt, tools: [...draft.agentTools, ...storyTools, ...(fast ? [] : canvasTools)], hostTools, takeSteering: input.takeSteering, lifeGroupId: input.lifeGroupId, performanceOnly: lifeOnly, signal, onStatus: input.onStatus, onProgress: input.onProgress,
     });
     try {
       signal.throwIfAborted();
