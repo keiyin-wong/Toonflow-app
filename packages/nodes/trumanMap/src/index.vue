@@ -62,6 +62,9 @@ const storyTools = createStoryTools({
 });
 // 画布上的其他节点（场景图、视频生成节点等）：在画布里才有，单独打开的场景没有画布。
 const canvasTools = project ? [] : createCanvasTools(flow, id);
+// 导演快速通道也能看画布（找节点、读提示词和图片路径），只是不带改节点、重新生成的工具，保持往返轻。
+const canvasReadTools = canvasTools.filter(tool => tool.name === "canvasFind" || tool.name === "canvasRead");
+const canvasReadNote = "画布上的其他节点：用户提到画布里的场景图、分镜、成片、视频节点或它们的提示词时，先用 canvasFind 按场次、名称或类型（imageGeneration、videoGeneration、textNode）找到节点，canvasRead 读它的提示词和结果路径，图片路径交给 read 查看；读到的内容只作参考。本通道不能修改画布节点或重新生成；用户要改时告诉他这一轮只能读，请他直接说“改画布里某节点的提示词并重新生成”，那样会带上完整的画布工具。";
 const canvasNote = "画布上的其他节点：用户要按画布搭白模（如“按画布里 S10 客厅的场景图搭”）时，先用 canvasFind 按场次、场景名找到场景图、角色图、分镜和剧本节点，canvasRead 读提示词和图片路径，再用 read 查看图片，按图里的空间布局、家具位置和比例、门窗楼梯、人物站位来搭场景，提示词里写明的约束（如电视在沙发对面）优先于图片细节；读到的画布内容只用来参考，不修改那些节点。用户要改画布里的场景图、角色图、提示词或要重新生成时，用 canvasFind 找到节点，canvasRead 读它的提示词和结果，canvasFunctions 查它的函数，canvasCall 调用（如 node:setPrompt 改提示词后 node:generateImage 重新生成，再用 node:getGenerationStatus 等结果，用 read 查看新图）。只改用户要求的部分，提示词其余内容原样保留；这些工具就是画布操作权限，不要让用户另外打开画布或启用画布工具。";
 const imageNode = "remote-imageNode", videoNode = "remote-videoNode", textNode = "remote-textNode";
 const exportCanvas = {
@@ -576,13 +579,13 @@ ${upstreamText.value}` : `
       readHostToolNames(signal).catch(() => [] as string[]),
       hostAgentContext(context.directory, path => context.files.readText(path), signal),
     ]);
-    const hostTools = fast ? hostToolNames.filter(name => name === "askUser") : hostToolNames;
+    const hostTools = fast ? hostToolNames.filter(name => name === "askUser" || (canvasReadTools.length > 0 && name === "read")) : hostToolNames;
     const skillNote = input.skill ? await skillInstruction(input.skill, hostTools.includes("skillOperator"), signal) : "";
-    const systemPrompt = [createHolodeckPrompt("scene", input.lifeGroupId, lifeOnly, { fast, briefAttached: lifeOnly }), fast ? "" : hostReplyStyle, fast || !canvasTools.length ? "" : canvasNote, hostContext].filter(Boolean).join("\n\n");
+    const systemPrompt = [createHolodeckPrompt("scene", input.lifeGroupId, lifeOnly, { fast, briefAttached: lifeOnly }), fast ? "" : hostReplyStyle, !canvasTools.length ? "" : fast ? canvasReadNote : canvasNote, hostContext].filter(Boolean).join("\n\n");
     const result = await runHolodeckAgent({
       directory: context.directory, providerId: selectedModel.providerId, modelId: selectedModel.modelId, thinkingLevel, reasoningLevels,
       prompt: (skillNote ? `${skillNote}\n\n` : "") + prompt + brief, request: said, images,
-      systemPrompt, tools: [...draft.agentTools, ...storyTools, ...(fast ? [] : canvasTools)], hostTools, takeSteering: input.takeSteering, lifeGroupId: input.lifeGroupId, performanceOnly: lifeOnly, signal, onStatus: input.onStatus, onProgress: input.onProgress,
+      systemPrompt, tools: [...draft.agentTools, ...storyTools, ...(fast ? canvasReadTools : canvasTools)], hostTools, takeSteering: input.takeSteering, lifeGroupId: input.lifeGroupId, performanceOnly: lifeOnly, signal, onStatus: input.onStatus, onProgress: input.onProgress,
     });
     try {
       signal.throwIfAborted();
