@@ -33,7 +33,14 @@
           <el-radio v-if="clipRange" value="clip">此片段 · {{ timecode(clipRange.start, doc.fps) }} – {{ timecode(clipRange.end, doc.fps) }}</el-radio>
           <el-radio value="all">整个视频 · {{ timecode(length, doc.fps) }}</el-radio>
           <el-radio v-if="programRange" value="inout">入点到出点 · {{ timecode(programRange.start, doc.fps) }} – {{ timecode(programRange.end, doc.fps) }}</el-radio>
+          <el-radio value="custom">自定义时间段</el-radio>
         </el-radio-group>
+        <div v-if="part === 'custom'" class="customRange">
+          <el-input v-model="customStart" placeholder="0:00.00" style="width: 110px" />
+          <span>–</span>
+          <el-input v-model="customEnd" placeholder="0:00.00" style="width: 110px" />
+          <span class="customHint">分:秒.帧，或秒数（如 12.5）</span>
+        </div>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -66,6 +73,19 @@ const format = ref<NonNullable<VideoExportOptions["format"]>>(props.only ? (prop
 const quality = ref<NonNullable<VideoExportOptions["quality"]>>(["high", "medium", "small"].includes(last.quality ?? "") ? last.quality as NonNullable<VideoExportOptions["quality"]> : "high");
 const scale = ref(["1", "0.75", "0.5", "0.25"].includes(last.scale ?? "") ? last.scale : "1");
 const part = ref(props.clipRange ? "clip" : props.programRange && last.part === "inout" ? "inout" : "all");
+const customStart = ref(timecode(props.programRange?.start ?? 0, props.doc.fps));
+const customEnd = ref(timecode(props.programRange?.end ?? docLength(props.doc), props.doc.fps));
+
+/** "1:23.12"（分:秒.帧）、"1:02:03.04"、"83.5"（秒）→ 秒；无法识别返回 null。 */
+function parseTime(text: string, fps: number): number | null {
+  const value = text.trim().replace(/：/g, ":");
+  if (/^\d+(\.\d+)?$/.test(value)) return Number(value);
+  const match = /^(?:(\d+):)?(\d+):(\d+)(?:\.(\d+))?$/.exec(value);
+  if (!match) return null;
+  const [, hours = "0", minutes, seconds, frames = "0"] = match;
+  if (Number(seconds) >= 60 || Number(frames) >= Math.ceil(fps)) return null;
+  return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds) + Number(frames) / fps;
+}
 const heard = reactive(Object.fromEntries(soundTracks.value.map(track => [track.id, ticked(track)])));
 const shown = reactive(Object.fromEntries(pictureTracks.value.map(track => [track.id, ticked(track)])));
 const even = (factor: number, value: number) => Math.round((value * factor) / 2) * 2;
@@ -83,6 +103,15 @@ function submit() {
   if ((format.value === "mp4" || format.value === "gif") && !shownIds.length && (format.value === "gif" || !heardIds.length)) {
     return ElMessage.warning(translate("没有勾选任何内容：请勾选轨道的画面或声音"));
   }
+  let custom: { start: number; end: number } | undefined;
+  if (part.value === "custom") {
+    const start = parseTime(customStart.value, props.doc.fps);
+    const end = parseTime(customEnd.value, props.doc.fps);
+    if (start === null || end === null) return ElMessage.warning(translate("时间格式不对：请填 分:秒.帧（如 1:23.12）或秒数（如 83.5）"));
+    const clampedEnd = Math.min(end, length.value);
+    if (clampedEnd - start < 1 / props.doc.fps) return ElMessage.warning(translate("结束时间要晚于开始时间，且不超过视频长度"));
+    custom = { start: Math.max(0, start), end: clampedEnd };
+  }
   // 轨道勾选不记忆：轨道 id 属于各工程，“导出此轨”从该轨单独开始。
   if (!props.only) localStorage.setItem(storageKey, JSON.stringify({ format: format.value, quality: quality.value, scale: scale.value, part: part.value }));
   emit("export", {
@@ -93,6 +122,7 @@ function submit() {
     scale: Number(scale.value) || 1,
     ...(part.value === "inout" && props.programRange && { range: props.programRange }),
     ...(part.value === "clip" && props.clipRange && { range: props.clipRange }),
+    ...(custom && { range: custom }),
   });
 }
 </script>
@@ -102,5 +132,7 @@ function submit() {
   .exportHint { margin: 0 0 12px; color: var(--el-text-color-secondary); font-size: 12px; line-height: 1.6; }
   .el-radio-group { display: flex; flex-direction: column; align-items: flex-start; }
   .el-checkbox { margin-right: 12px; }
+  .customRange { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .customHint { color: var(--el-text-color-secondary); font-size: 12px; }
 }
 </style>
