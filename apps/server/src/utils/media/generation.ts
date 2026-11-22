@@ -25,9 +25,21 @@ type MediaGenerationTask = {
   resume: boolean;
   checkpoint: MediaGenerationCheckpoint;
   modelRouteCipher?: string;
+  /** 任务创建时间：结果文件名里的日期时间取它，恢复任务时文件名不变。 */
+  createdAt?: number;
   save: (patch: Partial<MediaGenerationCheckpoint>) => Promise<void>;
 };
 const notSubmittedFailures = new WeakSet<object>();
+
+const pad = (value: number, length = 2) => String(value).padStart(length, "0");
+/** 生成结果文件名：类型_日期_时间_6位随机号（多张时再加序号），如 image_20261122_145530_483920.png、image_20261122_145530_483920_2.png。
+ * 有任务时日期取任务创建时间、随机号取自随机的 taskId，同一任务恢复后文件名不变。 */
+function outputFileName(mediaType: string, extension: string, index: number, task?: MediaGenerationTask) {
+  const time = new Date(task?.createdAt ?? Date.now());
+  const stamp = `${time.getFullYear()}${pad(time.getMonth() + 1)}${pad(time.getDate())}_${pad(time.getHours())}${pad(time.getMinutes())}${pad(time.getSeconds())}`;
+  const random = task ? Number.parseInt(task.taskId.replaceAll("-", "").slice(0, 8), 16) % 1000000 : crypto.getRandomValues(new Uint32Array(1))[0]! % 1000000;
+  return `${mediaType}_${stamp}_${pad(random, 6)}${index > 0 ? `_${index + 1}` : ""}.${extension}`;
+}
 
 export function isMediaNotSubmitted(cause: unknown) {
   return !!cause && typeof cause === "object" && notSubmittedFailures.has(cause);
@@ -284,8 +296,10 @@ async function executeMedia(
   const checkpoint = task?.checkpoint;
   const saved = new Map<number, GeneratedMedia>();
   for (const file of checkpoint?.files ?? []) {
-    const expected = join(outputDirectory, `${mediaType}${task!.taskId.replaceAll("-", "")}${file.index}.${mediaExtensions[file.mimeType]}`).replace(/\\/g, "/");
-    if (file.path !== expected || file.mediaType !== mediaType) invalid("任务结果文件记录与原生成请求不匹配");
+    // 旧版文件名（类型+taskId+序号）的任务仍可恢复。
+    const expected = [outputFileName(mediaType, mediaExtensions[file.mimeType]!, file.index, task), `${mediaType}${task!.taskId.replaceAll("-", "")}${file.index}.${mediaExtensions[file.mimeType]}`]
+      .map(name => join(outputDirectory, name).replace(/\\/g, "/"));
+    if (!expected.includes(file.path) || file.mediaType !== mediaType) invalid("任务结果文件记录与原生成请求不匹配");
     const { path } = await resolveWorkspacePath(directory, file.path);
     try {
       const info = await stat(path);
@@ -357,7 +371,7 @@ async function executeMedia(
       const release = lockWorkspaceFiles([output.path]);
       try {
         await mkdir(output.path, { recursive: true });
-        const file = join(outputDirectory, `${mediaType}${task ? `${task.taskId.replaceAll("-", "")}${index}` : crypto.randomUUID()}.${mediaExtensions[mimeType]}`);
+        const file = join(outputDirectory, outputFileName(mediaType, mediaExtensions[mimeType]!, index, task));
         const { path } = await resolveWorkspacePath(directory, file);
         const outputFile = { path: relative(directory, path).replace(/\\/g, "/"), mimeType, mediaType };
         if (task) {
