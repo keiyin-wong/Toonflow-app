@@ -145,6 +145,7 @@ import modelLoginGuide from "@/components/modelLoginGuide.vue";
 import { multiTenantEnabled, toonflowAccountToken } from "@/stores/settings";
 import { useWorkspaceStore } from "@/stores/workspace";
 import { registerWorkspaceControl, waitForControlValue } from "@/lib/mcpControl";
+import type { CanvasContext } from "@toonflow/tool-canvas/runtime";
 import anonymousData from "@/lib/anonymousData";
 import { useProviderBalances } from "@/lib/providerBilling";
 import canvasPanel from "./panels/canvas/canvasHost.vue";
@@ -228,7 +229,25 @@ function setDocumentPanel(value: Element | ComponentPublicInstance | null) {
   // KeepAlive 失活会清空模板 ref，保留同一工作区实例以协调后台文档保存和文件操作。
   if (value && directory) documentPanelCache.value = { directory, instance: value as InstanceType<typeof documentPanel> };
 }
-provide("canvas", () => canvasPanelRef.value?.getCanvasContext());
+// Agent 的剪辑操作和画布操作走同一条通道，按名称转给剪辑面板（切到剪辑面板，用户能看到改动）。
+const videoOperations = new Set(["getVideoEditor", "openVideoProject", "editVideo", "exportVideo"]);
+async function callVideo(name: string, args: Record<string, unknown>, signal: AbortSignal) {
+  if (!(await switchPanel("video"))) throw new Error("剪辑面板无法打开，请检查文档是否保存成功");
+  const panel = await waitForControlValue(() => videoPanelRef.value?.ready ? videoPanelRef.value : undefined, signal);
+  return panel.agentCall(name, args, signal);
+}
+function withVideo(context: CanvasContext | undefined): CanvasContext | undefined {
+  if (!context) return;
+  return {
+    get id() { return context.id; },
+    get tools() { return context.tools; },
+    getNodeLabel: context.getNodeLabel?.bind(context),
+    call: (request, signal) => videoOperations.has(request.name)
+      ? callVideo(request.name, request.args, signal ? AbortSignal.any([signal, controlLifetime.signal]) : controlLifetime.signal)
+      : context.call(request, signal),
+  };
+}
+provide("canvas", () => withVideo(canvasPanelRef.value?.getCanvasContext()));
 provide("mentionCanvas", () => canvasPanelRef.value?.mentionSource);
 provide("activateCanvasPanel", () => switchPanel("canvas"));
 provide("performWorkspaceFileAction", (directory: string, action: "copy" | "rename" | "move" | "delete", path: string, target?: string, entryType: "canvas" | "directory" = "canvas") =>
@@ -264,6 +283,11 @@ registerWorkspaceControl({
       if (request.args.panel === "document") await waitForControlValue(() => documentPanelRef.value?.ready ? documentPanelRef.value : undefined, callSignal);
       checkDirectory();
       return { panel: activePanel.value };
+    }
+    if (videoOperations.has(request.name)) {
+      const result = await callVideo(request.name, request.args, callSignal);
+      checkDirectory();
+      return result;
     }
     if (["getDocument", "openDocument", "writeDocument"].includes(request.name)) {
       if (!(await switchPanel("document"))) throw new Error("文档面板无法打开");

@@ -23,6 +23,7 @@ import { createAssetContext } from "@/agent/assets";
 import { readDocument } from "@/utils/documents";
 import { createMcpAgentTools } from "@/utils/mcp/servers";
 import { createPluginMarketTools } from "./pluginMarket";
+import { createVideoEditorTools } from "./videoEditor";
 import { currentIdentity } from "@/utils/multiTenant/context";
 import { modelGateway, requireDirectModelAccess } from "@/utils/multiTenant/gateway";
 import * as mediaTasks from "@/utils/media/tasks";
@@ -172,6 +173,8 @@ export async function createAgentTools(cwd: string, canvas?: CanvasContext, ques
   const tools = createPluginMarketTools(question);
   const names = new Set(tools.map(tool => tool.name));
   const context = createAgentToolContext(cwd, {}, canvas, question);
+  tools.push(...createVideoEditorTools(context.canvas));
+  for (const tool of tools) names.add(tool.name);
   function appendTools(definitions: ToolDefinition[], prompt: string, label: string) {
     for (const tool of definitions) {
       if (!tool.name || typeof tool.execute !== "function") throw new Error(t`${label} 返回了无效的工具`);

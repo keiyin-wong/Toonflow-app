@@ -3,6 +3,7 @@ import { pluginDevelopmentSchema } from "@/lib/pluginDevelopment";
 import type { CanvasInfo, CanvasContext } from "@toonflow/tools-scaffold/runtime";
 import { asrRequestSchema } from "@toonflow/tools-scaffold/runtime";
 import type { AgentEvent } from "@/agent/runtime/types";
+import { isVideoOperation, videoSchemas } from "@/agent/tools/videoEditor";
 
 type CanvasResult = { result?: unknown; error?: string; cancelled?: boolean; unavailable?: boolean };
 type PendingCall = { cwd: string; finish(response: CanvasResult): void };
@@ -22,7 +23,8 @@ export function createCanvasContext(cwd: string, canvas: CanvasInfo, send: (even
         if (disposed) throw new Error("画布调用所属对话已结束");
         signal?.throwIfAborted();
         const schema = request.name === "developPlugin" ? pluginDevelopmentSchema
-          : request.name === "transcribeAudio" ? asrRequestSchema : canvasOperations.find(item => item.name === request.name)?.parameters;
+          : request.name === "transcribeAudio" ? asrRequestSchema : isVideoOperation(request.name) ? videoSchemas[request.name]
+          : canvasOperations.find(item => item.name === request.name)?.parameters;
         if (!schema) throw new Error("画布操作不存在");
         const args = schema.parse(request.args);
         const callId = crypto.randomUUID();
@@ -42,7 +44,7 @@ export function createCanvasContext(cwd: string, canvas: CanvasInfo, send: (even
           };
           const abort = () => finish({ error: signal?.reason instanceof Error ? signal.reason.message : "画布调用已取消" });
           // ACT: 音频按实际时长播放，转写由浏览器检测停滞与收尾超时，仍接受本轮取消。
-          const timer = request.name === "transcribeAudio" ? undefined : setTimeout(() => finish({ error: "画布调用超时，请确认画布仍然打开", unavailable: true }), request.name === "developPlugin" ? 360000 : 120000);
+          const timer = request.name === "transcribeAudio" ? undefined : setTimeout(() => finish({ error: "画布调用超时，请确认画布仍然打开", unavailable: true }), request.name === "developPlugin" ? 360000 : request.name === "exportVideo" ? 1800000 : 120000);
           pendingCalls.set(callId, { cwd, finish });
           activeCalls.add(callId);
           signal?.addEventListener("abort", abort, { once: true });

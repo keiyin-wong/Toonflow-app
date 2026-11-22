@@ -95,7 +95,7 @@ export function useMcpControl() {
         calls.set(request.callId, controller);
         connectionCalls.set(request.callId, controller);
         // ACT: 长音频转写由 ASR 检测停滞与收尾超时，连接关闭和主动取消仍立即中止。
-        const callSignal = AbortSignal.any([signal, controller.signal, ...(request.name === "transcribeAudio" ? [] : [AbortSignal.timeout(request.name === "developPlugin" ? 360000 : 120000)])]);
+        const callSignal = AbortSignal.any([signal, controller.signal, ...(request.name === "transcribeAudio" ? [] : [AbortSignal.timeout(request.name === "developPlugin" ? 360000 : request.name === "exportVideo" ? 1800000 : 120000)])]);
         let result: unknown;
         let error: string | undefined;
         try {

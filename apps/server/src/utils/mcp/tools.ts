@@ -98,7 +98,7 @@ function wrapTool(name: string, description: string, schema: object, execute: (a
 
 const uiSchemas = {
   openProject: z.strictObject({ directory: z.string().min(1).max(4096) }),
-  switchPanel: z.strictObject({ panel: z.enum(["canvas", "document"]) }),
+  switchPanel: z.strictObject({ panel: z.enum(["canvas", "document", "video"]) }),
   getDocument: z.strictObject({}),
   openDocument: z.strictObject({ path: z.string().max(4096).optional(), canvasPath: z.string().max(4096).optional(), nodeId: z.string().max(256).optional(), handleId: z.string().max(256).optional() }),
   writeDocument: z.strictObject({ text: z.string().max(10_000_000), expectedText: z.string().max(10_000_000) }),
@@ -107,7 +107,7 @@ const uiSchemas = {
 };
 const uiDescriptions: Record<keyof typeof uiSchemas, string> = {
   openProject: "在目标 Toonflow 页面打开已有工作目录，并等待工作区就绪；操作前获取 getAppState 的 connectionId。",
-  switchPanel: "切换工作区的 canvas 画布或 document 文档面板，先保存当前编辑。",
+  switchPanel: "切换工作区的 canvas 画布、document 文档或 video 剪辑面板，先保存当前编辑。",
   getDocument: "读取当前文档内容和选择状态。writeDocument 必须携带本次读取的 text 作为 expectedText。",
   openDocument: "打开工作区中的文档文件(path)，或画布中的文本节点(canvasPath、nodeId，可选handleId)。",
   writeDocument: "通过文档编辑器保存当前文档；expectedText 必须匹配当前内容，防止覆盖用户新输入。",

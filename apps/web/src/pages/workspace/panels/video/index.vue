@@ -178,7 +178,7 @@
 
     <contextMenu v-if="menu" :x="menu.x" :y="menu.y" :items="menu.items" @close="menu = null" />
     <exportDialog v-if="exportOptions" :doc="doc" :only="exportOptions.only" :clipRange="exportOptions.part" :programRange="range.in !== null || range.out !== null ? rangeBounds() : undefined"
-      @close="exportOptions = null" @export="options => { exportOptions = null; void runExport(options); }" />
+      @close="exportOptions = null" @export="options => { exportOptions = null; void runExport(options).catch(() => {}); }" />
     <canvasPicker v-if="canvasPickerVisible" @close="canvasPickerVisible = false" @pick="path => { canvasPickerVisible = false; void openSource(path); }"
       @addAll="paths => { canvasPickerVisible = false; void addFiles(paths, magneticTrack(history.content.value), null); }" />
     <el-dialog v-model="shortcutsVisible" title="快捷键" width="min(560px, calc(100vw - 32px))" appendToBody>
@@ -210,6 +210,7 @@ import { guides, type GuideMode } from "./guides";
 import { lookPatch } from "./presets";
 import { markAt, putRange, rangeClip, type SourceMarks } from "./sourceEdit";
 import { stepZoom, zoomSteps } from "./viewZoom";
+import { applyOps, describeDoc, probeOps } from "./agentOps";
 import {
   addEffectTrack, addTrack, asPhoto, canJoin, clipLength, closeGaps, copyItems, detachAudio, docLength, duplicate, effectSeconds, effectTrackFor, extOf, fileName, fits, formatSrt,
   freeTrackAt, gapAt, insertIndex, itemsAcross, joinItems, magneticTrack, mediaKind, mergeDocs, newDoc, newEffect, newShape, normalizeDoc, parseSrt, pasteItems, patchClips,
@@ -908,19 +909,83 @@ async function exportFrame() {
   }
 }
 
-async function runExport(options: VideoExportOptions) {
+/** 导出当前工程；成功返回输出路径，失败或取消时更新导出状态后抛出（界面调用忽略异常）。 */
+async function runExport(options: VideoExportOptions, signal?: AbortSignal) {
   void flushSave().catch(() => {});
   const controller = new AbortController();
+  const exportSignal = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
   exportState.value = { state: "running", progress: 0, output: "", controller };
   try {
-    const output = await media.runExport(history.content.value, options, projectName.value, progress => { if (exportState.value) exportState.value.progress = progress; }, controller.signal);
+    const output = await media.runExport(history.content.value, options, projectName.value, progress => { if (exportState.value) exportState.value.progress = progress; }, exportSignal);
     exportState.value = { state: "done", progress: 1, output };
     refresh.value++;
+    return output;
   } catch (error) {
-    exportState.value = controller.signal.aborted
+    exportState.value = exportSignal.aborted
       ? { state: "cancelled", progress: 0, output: "" }
       : { state: "error", progress: 0, output: "", error: error instanceof Error ? error.message : String(error) };
+    throw error;
   }
+}
+
+// ---- Agent ----
+
+// 每次内容变化（含撤销、用户编辑、切换工程）都换新的 revision，Agent 基于旧内容的修改会被拒绝。
+let docRevision = 0;
+watch(() => history.content.value, () => docRevision++, { flush: "sync" });
+const revisionOf = () => `${projectPath.value}#${docRevision}`;
+
+function agentState() {
+  return {
+    projects: (projects.value ?? []).slice(0, 100),
+    project: projectPath.value ? { path: projectPath.value, name: projectName.value } : null,
+    revision: revisionOf(),
+    ...(projectPath.value ? describeDoc(history.content.value) : {}),
+    playhead: Math.round(time.value * 1000) / 1000,
+    selection: selection.value,
+    ...(exportState.value && { lastExport: { state: exportState.value.state, output: exportState.value.output, ...(exportState.value.error && { error: exportState.value.error }) } }),
+  };
+}
+
+async function agentCall(name: string, args: Record<string, unknown>, signal: AbortSignal) {
+  signal.throwIfAborted();
+  if (name === "getVideoEditor") {
+    if (!projects.value) await loadProjects();
+    return agentState();
+  }
+  if (name === "openVideoProject") {
+    const session = projectSession;
+    await flushSave();
+    const path = typeof args.create === "string" ? await createVideoProject(media.files, args.create) : String(args.path);
+    if (!currentSession(session)) throw new Error("工作区已切换，本次调用已停止");
+    await loadProjects();
+    if (!projects.value?.some(item => item.path === path)) throw new Error(`没有剪辑工程 ${path}`);
+    await openProject(path);
+    signal.throwIfAborted();
+    if (projectPath.value !== path) throw new Error("剪辑工程打开失败");
+    return agentState();
+  }
+  if (!projectPath.value) throw new Error("还没有打开剪辑工程，先用 openVideoProject 打开或新建");
+  if (name === "editVideo") {
+    if (args.revision !== revisionOf()) throw new Error("剪辑工程在此期间已被修改，请重新 getVideoEditor 后基于最新内容重做");
+    const ops = args.ops as Parameters<typeof applyOps>[1];
+    const base = history.content.value;
+    const path = projectPath.value;
+    const probed = await probeOps(ops, media.clipFor);
+    signal.throwIfAborted();
+    if (projectPath.value !== path || history.content.value !== base) throw new Error("剪辑工程在读取素材期间已被修改，请重新 getVideoEditor 后再试");
+    const result = applyOps(base, ops, probed);
+    if (result.doc !== base) history.set(result.doc);
+    if (result.made.length) selection.value = result.made.filter(id => result.doc.clips.some(clip => clip.id === id) || result.doc.texts.some(text => text.id === id));
+    return { ...agentState(), made: result.made };
+  }
+  if (name === "exportVideo") {
+    if (!length.value) throw new Error("时间线是空的，没有可导出的内容");
+    if (exportState.value?.state === "running") throw new Error("正在导出，等这次导出完成后再试");
+    const output = await runExport(args as VideoExportOptions, signal);
+    return { output, format: args.format ?? "mp4", length: Math.round(length.value * 1000) / 1000 };
+  }
+  throw new Error(`未知剪辑操作 ${name}`);
 }
 
 async function playOutput(path: string) {
@@ -1352,7 +1417,7 @@ onBeforeUnmount(() => {
   media.dispose();
 });
 
-defineExpose({ ready, flushSave, cancelSave, folders: videoFolders });
+defineExpose({ ready, flushSave, cancelSave, agentCall, folders: videoFolders });
 </script>
 
 <style lang="scss">
