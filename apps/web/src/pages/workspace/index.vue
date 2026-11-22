@@ -247,7 +247,25 @@ function withVideo(context: CanvasContext | undefined): CanvasContext | undefine
       : context.call(request, signal),
   };
 }
-provide("canvas", () => withVideo(canvasPanelRef.value?.getCanvasContext()));
+// 不在画布面板（停在剪辑、文档面板）时也要给 Agent 上下文，否则这一轮既没有剪辑工具也没有画布工具：
+// 剪辑操作照常转给剪辑面板，画布操作先切回画布面板、等画布就绪再执行（和工作区控制通道一致）。
+function backgroundCanvasContext(): CanvasContext {
+  return {
+    get id() { return canvasPanelRef.value?.canvasId ?? ""; },
+    tools: [],
+    async call(request, signal) {
+      const callSignal = signal ? AbortSignal.any([signal, controlLifetime.signal]) : controlLifetime.signal;
+      if (videoOperations.has(request.name)) return callVideo(request.name, request.args, callSignal);
+      if (!(await switchPanel("canvas"))) throw new Error("画布面板无法打开");
+      const context = await waitForControlValue(
+        () => (canvasPanelRef.value?.canvasReady || (!canvasPanelRef.value?.canvasId && canvasPanelRef.value?.canvasListReady) ? canvasPanelRef.value.getCanvasContext() : undefined),
+        callSignal
+      );
+      return context.call(request, callSignal);
+    },
+  };
+}
+provide("canvas", () => withVideo(canvasPanelRef.value?.getCanvasContext()) ?? backgroundCanvasContext());
 provide("mentionCanvas", () => canvasPanelRef.value?.mentionSource);
 provide("activateCanvasPanel", () => switchPanel("canvas"));
 provide("performWorkspaceFileAction", (directory: string, action: "copy" | "rename" | "move" | "delete", path: string, target?: string, entryType: "canvas" | "directory" = "canvas") =>
