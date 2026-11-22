@@ -72,6 +72,7 @@
 | [imagePromptCraft](knowledge/imagePromptCraft.md) | 景别词库、首帧语义、站位/朝向/反射面、参考绑定、Seedream 与 Nanobanana 提示词模板 | `data/skills/production_skills/storyboard_prompt_techniques.md`、`production_execution_storyboard_panel.md`，结合所选视觉技法 |
 | [videoPromptCraft](knowledge/videoPromptCraft.md) | 首帧、首尾帧、多参模式的动态/镜头/声音/引用结构与模型模板 | `data/modelPrompt/video/` 下通用首尾帧、通用多参、Wan 2.6、Seedance 2 四份文档，结合所选风格 `art_storyboard_video.md` |
 | [h3PromptBase](knowledge/h3PromptBase.md)、[h3PromptReference](knowledge/h3PromptReference.md) | MiniMax H3 官方视频提示词格式（T2VA / I2VA / FL2VA / L2VA / Ref2VA），由 videoPromptCraft 的 H3 模板引用 | 不是 v1.1.8 原有；2026-11-17 用户加入，按 MiniMax 官方指南原文复制 |
+| [shotCraft](knowledge/shotCraft.md) 的“镜头功能、视线与节奏”，[directorPlan](directorPlan.md) 的本集锚点 | 镜头功能分类、每镜三项任务、运镜挂在剧情变化上、单一视线落点、节奏阶梯与爆发前停顿、Murch 六原则与剪切方式、五个锚点 | 不是 v1.1.8 原有；2026-11-22 用户加入，改写自 visual-skills（Serge Shima，github.com/smixs/visual-skills，CC BY 4.0）的 `video/references/dramaturgy.md`、`role-modes.md`，已改为只用剧本已有内容、不删不并已确认镜头 |
 
 实际加载链路也已核对：
 
