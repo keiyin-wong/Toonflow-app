@@ -695,11 +695,14 @@ export async function loadMediaProviderSource(source: string, config: Record<str
         const directory = await mkdtemp(join(temporaryRoot, "toonflowProviderExec"));
         try {
           const paths = await Promise.all((inputFiles ?? []).map(async (file, index) => {
-            if (!(file?.data instanceof Uint8Array) || !file.data.length) throw Object.assign(new Error(`临时输入文件 ${index} 没有内容`), { status: 422 });
+            // 供应商沙箱与宿主分属不同 realm，instanceof 跨 realm 不成立；按视图槽位识别并重建宿主字节。
+            const view = file?.data as unknown;
+            const bytes = ArrayBuffer.isView(view) && (view as Uint8Array).BYTES_PER_ELEMENT === 1 ? new Uint8Array((view as Uint8Array).buffer, (view as Uint8Array).byteOffset, (view as Uint8Array).byteLength) : undefined;
+            if (!bytes?.length) throw Object.assign(new Error(`临时输入文件 ${index} 没有内容`), { status: 422 });
             const name = String(file.name ?? "").trim() || `input${index}`;
             if (name.includes("/") || name.includes("\\") || name.includes("..")) throw Object.assign(new Error("临时文件名不能包含路径"), { status: 422 });
             const path = join(directory, name);
-            await writeFile(path, file.data, { flag: "wx", mode: 0o600 });
+            await writeFile(path, bytes, { flag: "wx", mode: 0o600 });
             return path;
           }));
           const finalArgs = cliArgs.map(arg => {

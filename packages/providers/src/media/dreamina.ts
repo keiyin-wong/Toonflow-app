@@ -18,6 +18,16 @@ const rules = [
     props: { placeholder: "dreamina-canvas auth profile，默认 default" },
   },
   {
+    type: "select",
+    field: "runMode" as const,
+    title: "生成方式",
+    value: "auto",
+    options: [
+      { label: "自动：CLI 直接生成并扣积分", value: "auto" },
+      { label: "手动：放到即梦桥接画布，在网页点生成（可用 Unlimited）", value: "manual" },
+    ],
+  },
+  {
     type: "inputNumber",
     field: "creditCeiling" as const,
     title: "单次生成积分上限",
@@ -59,7 +69,8 @@ function cfg(context: ProviderContext) {
   const ceiling = Number(context.config.creditCeiling);
   const creditCeiling = Number.isFinite(ceiling) && ceiling >= 1 ? Math.floor(ceiling) : 200;
   const bridgeCanvasName = String(context.config.bridgeCanvasName ?? "").trim() || "Toonflow";
-  return { cliPath, profile, creditCeiling, bridgeCanvasName };
+  const manual = context.config.runMode === "manual";
+  return { cliPath, profile, creditCeiling, bridgeCanvasName, manual };
 }
 
 async function cli<T>(context: ProviderContext, args: string[], options?: {
@@ -80,7 +91,8 @@ async function cli<T>(context: ProviderContext, args: string[], options?: {
     throw Object.assign(new Error(`Dreamina 需要登录：请在终端运行 ${cliPath} auth login 完成授权后重试`), { code: "MEDIA_TASK_FAILED" });
   }
   let parsed: CliEnvelope<T> | undefined;
-  for (const line of result.stdout.split("\n")) {
+  // CLI 1.4 起成功结果写 stdout、失败结果写 stderr，两者都要解析。
+  for (const line of `${result.stdout}\n${result.stderr}`.split("\n")) {
     if (line.startsWith("{\"schemaVersion\"")) {
       try { parsed = JSON.parse(line) as CliEnvelope<T>; } catch { parsed = undefined; }
     }
@@ -89,6 +101,8 @@ async function cli<T>(context: ProviderContext, args: string[], options?: {
     throw Object.assign(new Error(`Dreamina CLI 输出无法解析（exit ${result.exitCode}）：${(result.stderr || result.stdout || "无输出").slice(0, 300)}`), { code: "MEDIA_TASK_FAILED" });
   }
   if (!parsed.ok) {
+    // 同一登录配置重新登录了别的账号时，缓存的桥接画布不属于新账号；画布内操作失败就丢弃缓存，下次重新查找。
+    if (args.includes("--project-id")) bridgeCache = undefined;
     const detail = parsed.error?.diagnostics?.map(item => item.detail).filter(Boolean).join("；") ?? "";
     throw Object.assign(new Error(`Dreamina：${parsed.error?.message ?? "未知错误"}${detail ? `（${detail}）` : ""}`), { code: "MEDIA_TASK_FAILED" });
   }
@@ -136,10 +150,20 @@ async function bytesOf(context: ProviderContext, input: MediaInput): Promise<{ d
   return { data: new Uint8Array(await response.arrayBuffer()), mimeType, name: input.name };
 }
 
-interface BridgeCanvas { projectId: string; cliPath: string; }
+// 桥接画布属于登录账号：按 CLI、登录配置和画布名缓存，换配置后重新查找。
+interface BridgeCanvas { projectId: string; key: string; }
 let bridgeCache: BridgeCanvas | undefined;
+const bridgeKey = (context: ProviderContext) => {
+  const { cliPath, profile, bridgeCanvasName } = cfg(context);
+  return JSON.stringify([cliPath, profile, bridgeCanvasName]);
+};
 // CLI 拒绝重复的 ref 值，多参考图估价需逐个不同的占位资源；按索引缓存复用。
 const placeholderCache = new Map<string, string[]>();
+// 估价节点 ID 按 CLI@画布:类型 缓存，省去每次估价的 node find。
+const quoteNodeCache = new Map<string, string>();
+// ACT: 报价只取决于价格参数，按参数缓存 10 分钟并合并在途请求；宿主估价时限仅 8 秒且超时不会中止 CLI，
+// 不缓存时多节点、频繁改参的估价在串行队列中积压而全部超时。即梦调价最多延迟 10 分钟生效。
+const quoteCache = new Map<string, { expires: number; value: Promise<QuoteResult> }>();
 
 let quoteQueueTail: Promise<unknown> = Promise.resolve();
 
@@ -151,39 +175,41 @@ function runQuoteSerially<T>(task: () => Promise<T>): Promise<T> {
 }
 
 async function bridge(context: ProviderContext): Promise<string> {
-  const { cliPath, bridgeCanvasName } = cfg(context);
-  if (bridgeCache?.cliPath === cliPath) return bridgeCache.projectId;
+  const { bridgeCanvasName } = cfg(context);
+  const key = bridgeKey(context);
+  if (bridgeCache?.key === key) return bridgeCache.projectId;
   const list = await cli<{ items?: { projectId?: string; name?: string }[] }>(context, ["canvas", "ls", "--limit", "50", "--format", "json"]);
   const found = list.items?.find(item => item.projectId && item.name === bridgeCanvasName);
   if (found?.projectId) {
-    bridgeCache = { projectId: found.projectId, cliPath };
+    bridgeCache = { projectId: found.projectId, key };
     return found.projectId;
   }
   const created = await cli<{ project?: { projectId?: string } }>(context, ["canvas", "create", bridgeCanvasName, "--format", "json"]);
   const projectId = created.project?.projectId;
   if (!projectId) throw Object.assign(new Error("Dreamina 桥接画布创建失败：未返回 projectId"), { code: "MEDIA_TASK_FAILED" });
-  bridgeCache = { projectId, cliPath };
+  bridgeCache = { projectId, key };
   return projectId;
 }
 
-// 1x1 透明 PNG：仅用于满足图生模式的引用下限；已验证报价只按参数计价，与素材内容无关（ACT 假设，如后续报价随内容变化需改为真实素材估价）。
+// 512x512 灰色 PNG：仅用于满足图生模式的引用下限（Seedance 2.5 要求参考图宽度 ≥300px）；已验证报价只按参数计价，与素材内容无关（ACT 假设，如后续报价随内容变化需改为真实素材估价）。
 const placeholderPng = Uint8Array.from(
-  Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64"),
+  Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAFlklEQVR42u3VMQEAAAzCMKQjHQ97l0jo0xSAlyIBgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGACAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGACAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGACAAUgAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGACAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGACAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgBgAAAYAAAGAIABAGAAABgAAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAADcDrctaAb6XeXAAAAAASUVORK5CYII=", "base64"),
 );
 
 async function placeholderResources(context: ProviderContext, projectId: string, count: number): Promise<string[]> {
   const { cliPath } = cfg(context);
   const key = `${cliPath}@${projectId}`;
-  const cached = placeholderCache.get(key) ?? [];
-  while (cached.length < count) {
+  let cached = placeholderCache.get(key);
+  if (!cached) placeholderCache.set(key, cached = []);
+  // 估价总时限只有数秒：缺少的占位资源并行上传，每完成一个立即入缓存，超时中止后下次估价接着补齐。
+  const start = cached.length;
+  await Promise.all(Array.from({ length: Math.max(0, count - start) }, async (_, offset) => {
     const uploaded = await cli<{ resourceId?: string }>(context, [
-      "resource", "upload", "--file", "{{file:0}}", "--name", `toonflow-quote-placeholder-${cached.length + 1}`, "--project-id", projectId, "--format", "json",
+      "resource", "upload", "--file", "{{file:0}}", "--name", `toonflow-quote-placeholder-${start + offset + 1}`, "--project-id", projectId, "--format", "json",
     ], { inputFiles: [{ data: placeholderPng, name: "placeholder.png" }] });
-    const resourceId = uploaded.resourceId;
-    if (!resourceId) throw Object.assign(new Error("Dreamina 占位资源上传失败"), { code: "MEDIA_TASK_FAILED" });
-    cached.push(resourceId);
-  }
-  placeholderCache.set(key, cached);
+    if (!uploaded.resourceId) throw Object.assign(new Error("Dreamina 占位资源上传失败"), { code: "MEDIA_TASK_FAILED" });
+    cached.push(uploaded.resourceId);
+  }));
   return cached.slice(0, count);
 }
 
@@ -200,11 +226,12 @@ async function uploadMedia(context: ProviderContext, input: MediaInput, projectI
 
 interface QuoteResult { totalMaxCredits?: number; items?: { maxCredits?: number; error?: { message?: string } }[]; }
 
-function quoteResult(quote: QuoteResult): ProviderPrice | null {
+function quoteResult(quote: QuoteResult, manual = false): ProviderPrice | null {
   const item = quote.items?.[0];
   if (item?.error) return { price: "无法估价", tips: item.error.message ?? "" };
   const credits = quote.totalMaxCredits ?? item?.maxCredits;
   if (typeof credits !== "number") return null;
+  if (manual) return { price: `手动 · 原价≈${credits} 积分`, tips: "手动模式：节点放到即梦桥接画布，在网页点生成；开 Unlimited 时不扣积分" };
   return { price: `≈${credits} 积分`, tips: "即梦报价（本次最多消耗）；实际扣费以即梦记录为准" };
 }
 
@@ -240,26 +267,52 @@ async function quoteParams(context: ProviderContext, kind: "image" | "video", pa
   mode?: string;
   referenceCount: number;
 }): Promise<QuoteResult> {
+  const { cliPath, profile } = cfg(context);
+  const priceKey = JSON.stringify([cliPath, profile, kind, params.model, params.ratio, params.resolution, params.duration, params.count, params.mode, params.referenceCount]);
+  const now = Date.now();
+  for (const [key, cached] of quoteCache) if (cached.expires <= now) quoteCache.delete(key);
+  const cached = quoteCache.get(priceKey);
+  if (cached) return cached.value;
+  const entry = { expires: now + 10 * 60_000, value: quoteParamsNow(context, kind, params) };
+  quoteCache.set(priceKey, entry);
+  // 失败或报价项带错误时不保留，下次重新估价。
+  const drop = () => { if (quoteCache.get(priceKey) === entry) quoteCache.delete(priceKey); };
+  entry.value.then(result => { if (result.items?.[0]?.error) drop(); }, drop);
+  return entry.value;
+}
+
+function quoteParamsNow(context: ProviderContext, kind: "image" | "video", params: Parameters<typeof quoteParams>[2]): Promise<QuoteResult> {
   return runQuoteSerially(async () => {
     const projectId = await bridge(context);
-    const found = await cli<{ items?: { nodeId?: string }[] }>(context, [
-      "node", "find", "--name", `toonflow quote ${kind}`, "--type", kind, "--limit", "1", "--project-id", projectId, "--format", "json",
-    ]);
+    const cacheKey = `${cfg(context).cliPath}@${projectId}:${kind}`;
     let refs: string[] = [];
     if (params.referenceCount > 0) {
       refs = (await placeholderResources(context, projectId, params.referenceCount)).map(id => `res:${id}`);
     }
-    const generationArgs = buildGenerationArgs(kind, { ...params, refs });
-    let nodeId = found.items?.[0]?.nodeId;
+    // 报价只按参数计价（同占位素材的 ACT 假设），固定提示词，避免编辑提示词反复触发估价。
+    const generationArgs = buildGenerationArgs(kind, { ...params, prompt: "quote", refs });
+    let nodeId = quoteNodeCache.get(cacheKey);
     if (nodeId) {
-      await cli(context, ["node", "edit", ...generationArgs, "--node-id", nodeId, "--project-id", projectId, "--format", "json"]);
-    } else {
-      const created = await cli<{ node?: { nodeId?: string } }>(context, [
-        "node", "create", ...generationArgs, "--title", `toonflow quote ${kind}`, "--project-id", projectId, "--format", "json",
-      ]);
-      nodeId = created.node?.nodeId;
+      // 缓存的节点可能已在即梦网页端被删除，编辑失败时回退为重新查找或创建。
+      nodeId = await cli(context, ["node", "edit", ...generationArgs, "--node-id", nodeId, "--project-id", projectId, "--format", "json"])
+        .then(() => nodeId, () => undefined);
     }
-    if (!nodeId) throw Object.assign(new Error("Dreamina 估价节点创建失败"), { code: "MEDIA_TASK_FAILED" });
+    if (!nodeId) {
+      const found = await cli<{ items?: { nodeId?: string }[] }>(context, [
+        "node", "find", "--name", `toonflow quote ${kind}`, "--type", kind, "--limit", "1", "--project-id", projectId, "--format", "json",
+      ]);
+      nodeId = found.items?.[0]?.nodeId;
+      if (nodeId) {
+        await cli(context, ["node", "edit", ...generationArgs, "--node-id", nodeId, "--project-id", projectId, "--format", "json"]);
+      } else {
+        const created = await cli<{ node?: { nodeId?: string } }>(context, [
+          "node", "create", ...generationArgs, "--title", `toonflow quote ${kind}`, "--project-id", projectId, "--format", "json",
+        ]);
+        nodeId = created.node?.nodeId;
+      }
+      if (!nodeId) throw Object.assign(new Error("Dreamina 估价节点创建失败"), { code: "MEDIA_TASK_FAILED" });
+      quoteNodeCache.set(cacheKey, nodeId);
+    }
     return cli<QuoteResult>(context, ["node", "quote", "--node-id", nodeId, "--project-id", projectId, "--format", "json"]);
   });
 }
@@ -287,19 +340,7 @@ async function pollAndDownload(context: ProviderContext, projectId: string, subm
     const state = String(status.state ?? "");
     if (state === "succeeded" || state === "partial_success") {
       const resourceIds = (status.resources ?? []).map(item => item.resourceId).filter((id): id is string => !!id);
-      if (!resourceIds.length) throw Object.assign(new Error("Dreamina 任务成功但没有输出资源"), { code: "MEDIA_TASK_FAILED" });
-      const assets: MediaAsset[] = [];
-      for (const resourceId of resourceIds) {
-        const downloaded = await cli<{ outputs?: { name: string; data: Uint8Array }[] }>(context, [
-          "resource", "download", resourceId, "--project-id", projectId, "--output", "{{dir}}", "--format", "json",
-        ], { readOutputs: true, timeoutMs: 600_000 });
-        const file = downloaded.outputs?.find(item => item.data?.length) ?? downloaded.outputs?.[0];
-        if (!file?.data?.length) throw Object.assign(new Error(`Dreamina 资源 ${resourceId} 下载失败`), { code: "MEDIA_TASK_FAILED" });
-        const ext = /\.[a-z0-9]+$/i.exec(file.name)?.[0] ?? "";
-        const mimeType = Object.entries(mimeExt).find(([, value]) => value === ext)?.[0] ?? `${mediaType}/mp4`;
-        assets.push({ mediaType, type: "binary", data: file.data, mimeType, name: file.name });
-      }
-      return assets;
+      return downloadResources(context, projectId, resourceIds, mediaType);
     }
     if (state === "failed" || state === "canceled") {
       throw Object.assign(new Error(`Dreamina 生成${state === "failed" ? "失败" : "已取消"}`), { code: "MEDIA_TASK_FAILED" });
@@ -308,7 +349,67 @@ async function pollAndDownload(context: ProviderContext, projectId: string, subm
   }
 }
 
-interface GenerationIdentity { kind: "image" | "video"; projectId: string; nodeId: string; submitId: string; }
+async function downloadResources(context: ProviderContext, projectId: string, resourceIds: string[], mediaType: "image" | "video"): Promise<MediaAsset[]> {
+  if (!resourceIds.length) throw Object.assign(new Error("Dreamina 任务成功但没有输出资源"), { code: "MEDIA_TASK_FAILED" });
+  const assets: MediaAsset[] = [];
+  for (const resourceId of resourceIds) {
+    const downloaded = await cli<{ outputs?: { name: string; data: Uint8Array }[] }>(context, [
+      "resource", "download", resourceId, "--project-id", projectId, "--output", "{{dir}}", "--format", "json",
+    ], { readOutputs: true, timeoutMs: 600_000 });
+    const file = downloaded.outputs?.find(item => item.data?.length) ?? downloaded.outputs?.[0];
+    if (!file?.data?.length) throw Object.assign(new Error(`Dreamina 资源 ${resourceId} 下载失败`), { code: "MEDIA_TASK_FAILED" });
+    const ext = /\.[a-z0-9]+$/i.exec(file.name)?.[0] ?? "";
+    const mimeType = Object.entries(mimeExt).find(([, value]) => value === ext)?.[0] ?? `${mediaType}/mp4`;
+    assets.push({ mediaType, type: "binary", data: file.data, mimeType, name: file.name });
+  }
+  return assets;
+}
+
+interface NodeResource { resourceId?: string; status?: string; submitId?: string; createdAt?: number; source?: string; }
+interface NodeShow { nodes?: { result?: string; node?: { status?: string; resources?: NodeResource[] } }[]; }
+
+// 手动模式：节点已放到桥接画布但不运行，等用户在即梦网页点生成（可用会员 Unlimited），完成后取回最新一次生成的结果。
+// 生成失败时继续等待，用户可在网页重新生成；不想等了在 Toonflow 取消即可。
+async function waitManualNode(context: ProviderContext, projectId: string, nodeId: string, mediaType: "image" | "video"): Promise<MediaAsset[]> {
+  const deadline = Date.now() + 24 * 60 * 60_000;
+  let transientFailures = 0;
+  while (true) {
+    context.signal?.throwIfAborted();
+    if (Date.now() > deadline) throw Object.assign(new Error("等待即梦网页生成超时（24 小时）"), { code: "MEDIA_TASK_FAILED" });
+    let shown: NodeShow;
+    try {
+      shown = await cli<NodeShow>(context, ["node", "show", "--node-id", nodeId, "--project-id", projectId, "--format", "json"], { timeoutMs: 60_000 });
+      transientFailures = 0;
+    } catch (error) {
+      if (++transientFailures > 6) throw error;
+      await wait(context, 15_000);
+      continue;
+    }
+    const entry = shown.nodes?.[0];
+    if (!entry?.node || entry.result !== "FOUND") throw Object.assign(new Error("即梦桥接画布上的待生成节点已被删除"), { code: "MEDIA_TASK_FAILED" });
+    const generated = (entry.node.resources ?? []).filter(item => item.source === "generated" && item.resourceId);
+    const latest = generated.reduce<NodeResource | undefined>((best, item) => (!best || (item.createdAt ?? 0) > (best.createdAt ?? 0) ? item : best), undefined);
+    if (latest) {
+      const batch = generated.filter(item => item.submitId === latest.submitId);
+      const done = batch.filter(item => item.status === "success");
+      const pending = batch.some(item => item.status !== "success" && item.status !== "failed");
+      if (!pending && done.length) return downloadResources(context, projectId, done.map(item => item.resourceId!), mediaType);
+    }
+    await wait(context, 10_000);
+  }
+}
+
+async function placeManualNode(context: ProviderContext, kind: "image" | "video", projectId: string, generationArgs: string[]): Promise<MediaAsset[]> {
+  const created = await cli<{ node?: { nodeId?: string } }>(context, [
+    "node", "create", ...generationArgs, "--title", "toonflow 待生成", "--project-id", projectId, "--format", "json",
+  ], { timeoutMs: 300_000 });
+  const nodeId = created.node?.nodeId;
+  if (!nodeId) throw Object.assign(new Error("Dreamina 节点创建失败：未返回 nodeId"), { code: "MEDIA_TASK_FAILED" });
+  await context.saveTaskData?.({ kind, projectId, nodeId, manual: true } satisfies ProviderTaskData);
+  return waitManualNode(context, projectId, nodeId, kind);
+}
+
+interface GenerationIdentity { kind: "image" | "video"; projectId: string; nodeId: string; submitId?: string; manual?: boolean; }
 
 async function runGeneration(context: ProviderContext, kind: "image" | "video", params: {
   prompt: string;
@@ -320,10 +421,11 @@ async function runGeneration(context: ProviderContext, kind: "image" | "video", 
   mode?: string;
   refs: string[];
 }): Promise<MediaAsset[]> {
-  const { creditCeiling } = cfg(context);
+  const { creditCeiling, manual } = cfg(context);
   const projectId = await bridge(context);
-  const submitId = uuid();
   const generationArgs = buildGenerationArgs(kind, params);
+  if (manual) return placeManualNode(context, kind, projectId, generationArgs);
+  const submitId = uuid();
   const created = await cli<{ node?: { nodeId?: string } }>(context, [
     "node", "create", ...generationArgs, "--title", "toonflow", "--run", "--yes",
     "--credit-ceiling", String(creditCeiling), "--submit-id", submitId, "--project-id", projectId, "--format", "json",
@@ -364,12 +466,19 @@ function videoRefsAndPrompt(request: ReferencedVideoRequest, cliMode: "t2v" | "m
   for (const [index, id] of uploaded.audios.entries()) lookup[`audio:${index}`] = id;
   if (uploaded.first) lookup["firstFrame:0"] = uploaded.first;
   if (uploaded.last) lookup["lastFrame:0"] = uploaded.last;
-  const prompt = String(request.prompt ?? "").replace(/\{\{ref (\d+)\}\}/g, (marker, number: string) => {
-    const reference = request.referenceOrder?.[Number(number) - 1];
-    if (!reference) return marker;
-    if (reference.type === "text") return `参考 ${number}`;
-    const id = "index" in reference ? lookup[`${reference.type}:${reference.index}`] : lookup[`${reference.type}:0`];
-    return id ? `{{res:${id}}}` : marker;
+  // 没有 referenceOrder 时，{{ref N}} 按首帧、尾帧、图片、视频、音频的上传顺序对应第 N 个参考。
+  const fallback = [
+    ...(uploaded.first ? ["firstFrame:0"] : []), ...(uploaded.last ? ["lastFrame:0"] : []),
+    ...uploaded.images.map((_, index) => `image:${index}`), ...uploaded.videos.map((_, index) => `video:${index}`), ...uploaded.audios.map((_, index) => `audio:${index}`),
+  ];
+  // 找不到对应素材的标记改成纯文本，避免把 {{ref N}} 原样发给即梦被判为非法引用。
+  const prompt = String(request.prompt ?? "").replace(/\{\{ref (\d+)\}\}/g, (_marker, number: string) => {
+    let id: string | undefined;
+    if (request.referenceOrder) {
+      const reference = request.referenceOrder[Number(number) - 1];
+      if (reference && reference.type !== "text") id = "index" in reference ? lookup[`${reference.type}:${reference.index}`] : lookup[`${reference.type}:0`];
+    } else id = lookup[fallback[Number(number) - 1] ?? ""];
+    return id ? `{{res:${id}}}` : `参考 ${number}`;
   });
   const refs: string[] = [];
   if (cliMode === "first_last_frame") {
@@ -399,7 +508,8 @@ export default {
 
 - 估价：改参数时按当前模型与档位显示预计积分（Dreamina 官方报价，不生成、不扣费）；
 - 生成：真实扣积分，超过「单次生成积分上限」会自动停止并提示；
-- 生成结果同时会保存在 Dreamina 的桥接画布（可在即梦网页端查看与继续编辑）。`,
+- 生成结果同时会保存在 Dreamina 的桥接画布（可在即梦网页端查看与继续编辑）；
+- 「生成方式」选手动时，Toonflow 只把参考素材和参数放到桥接画布上（节点名「toonflow 待生成」），不扣积分；你在即梦网页打开桥接画布、按需开启 Unlimited 并点生成，完成后结果自动回到 Toonflow。网页生成失败可直接重试，Toonflow 会继续等待（最长 24 小时，可随时取消）。`,
   rules,
   models: [
     {
@@ -463,7 +573,7 @@ export default {
       label: "Seedance 2.5",
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:30", "videoReference:10", "audioReference:10"]],
-      durationResolutionMap: [{ duration: [5], resolution: ["480p", "720p", "1080p", "4k"] }],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], resolution: ["480p", "720p", "1080p", "4k"] }],
       imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
@@ -471,7 +581,14 @@ export default {
       label: "Seedance 2.5 Flash",
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:10", "videoReference:5", "audioReference:5"]],
-      durationResolutionMap: [{ duration: [5], resolution: ["480p", "720p"] }],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], resolution: ["480p", "720p"] }],
+    },
+    {
+      id: "seedance_2.5_draft",
+      label: "Seedance 2.5 Draft",
+      type: "video",
+      mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:30", "videoReference:10", "audioReference:10"]],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], resolution: ["480p"] }],
       imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
@@ -479,7 +596,7 @@ export default {
       label: "Seedance 2.0",
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:9", "videoReference:3", "audioReference:3"]],
-      durationResolutionMap: [{ duration: [5], resolution: ["720p", "1080p", "4K"] }],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], resolution: ["720p", "1080p", "4K"] }],
       imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
@@ -487,7 +604,14 @@ export default {
       label: "Seedance 2.0 Fast",
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:9", "videoReference:3", "audioReference:3"]],
-      durationResolutionMap: [{ duration: [5], resolution: ["720p"] }],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], resolution: ["720p"] }],
+    },
+    {
+      id: "seedance_2.0_mini",
+      label: "Seedance 2.0 Mini",
+      type: "video",
+      mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:9", "videoReference:3", "audioReference:3"]],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], resolution: ["720p"] }],
       imageRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"],
     },
     {
@@ -519,7 +643,7 @@ export default {
       label: "Wan 3.0",
       type: "video",
       mode: ["text", "startEndRequired", "endFrameOptional", ["imageReference:10", "videoReference:5", "audioReference:5"]],
-      durationResolutionMap: [{ duration: [5], resolution: ["720P", "1080P"] }],
+      durationResolutionMap: [{ duration: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], resolution: ["720P", "1080P"] }],
       imageRatios: ["16:9", "4:3", "1:1", "3:4", "9:16"],
     },
   ] satisfies ProviderModel[],
@@ -537,7 +661,7 @@ export default {
         mode: imageReferenceCount ? "i2i" : "t2i",
         referenceCount: imageReferenceCount,
       });
-      return quoteResult(quote);
+      return quoteResult(quote, cfg(context).manual);
     }
     const videoReferenceCount = (request.firstFrame ? 1 : 0) + (request.lastFrame ? 1 : 0) + (request.images?.length ?? 0) + (request.videos?.length ?? 0) + (request.audios?.length ?? 0);
     const quote = await quoteParams(context, "video", {
@@ -549,7 +673,7 @@ export default {
       mode: videoReferenceCount ? resolveVideoMode(request.mode, request as ReferencedVideoRequest) : "t2v",
       referenceCount: videoReferenceCount,
     });
-    return quoteResult(quote);
+    return quoteResult(quote, cfg(context).manual);
   },
   async getBalance(): Promise<ProviderBalance> {
     const account = await cli<{ availableCredits?: string | number }>(this as ProviderContext, [
@@ -568,12 +692,11 @@ export default {
       lookup[index] = await uploadMedia(context, input, projectId, `toonflow ref image ${index + 1}`);
       refs.push(`res:${lookup[index]}`);
     }
-    const prompt = String(request.prompt ?? "").replace(/\{\{ref (\d+)\}\}/g, (marker, number: string) => {
-      const reference = request.referenceOrder?.[Number(number) - 1];
-      if (!reference) return marker;
-      if (reference.type === "text") return `参考 ${number}`;
-      const id = "index" in reference ? lookup[reference.index] : undefined;
-      return id ? `{{res:${id}}}` : marker;
+    // 没有 referenceOrder（如 Agent 直接发起的生成）时，{{ref N}} 按参考图顺序对应第 N 张。
+    const prompt = String(request.prompt ?? "").replace(/\{\{ref (\d+)\}\}/g, (_marker, number: string) => {
+      const reference = request.referenceOrder ? request.referenceOrder[Number(number) - 1] : { type: "image" as const, index: Number(number) - 1 };
+      const id = reference && "index" in reference ? lookup[reference.index] : undefined;
+      return id ? `{{res:${id}}}` : `参考 ${number}`;
     });
     return runGeneration(context, "image", {
       prompt,
@@ -605,6 +728,9 @@ export default {
     const context = this as ProviderContext;
     const identity = data as Partial<GenerationIdentity>;
     if (identity.kind !== "image" && identity.kind !== "video") throw Object.assign(new Error("Dreamina 任务恢复数据无效"), { code: "MEDIA_TASK_FAILED" });
+    if (identity.manual === true && typeof identity.projectId === "string" && typeof identity.nodeId === "string" && identity.projectId && identity.nodeId) {
+      return waitManualNode(context, identity.projectId, identity.nodeId, identity.kind);
+    }
     if (typeof identity.projectId !== "string" || typeof identity.submitId !== "string" || !identity.projectId || !identity.submitId) {
       throw Object.assign(new Error("Dreamina 任务恢复数据无效：缺少画布或任务标识"), { code: "MEDIA_TASK_FAILED" });
     }
