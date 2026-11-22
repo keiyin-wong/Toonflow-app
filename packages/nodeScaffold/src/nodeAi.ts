@@ -348,7 +348,8 @@ export function useNodeAi(options: { onModelsChanged?: () => unknown } = {}) {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-toonflow-workspace": "1" },
         body: JSON.stringify(input),
-        signal: AbortSignal.timeout(15000),
+        // 须长于服务端素材读取 5 秒 + 供应商估价 25 秒。
+        signal: AbortSignal.timeout(35000),
       }).then(readResult<NodeMediaPrice | null>).then(price => {
         if (price !== null && (!price || typeof price.price !== "string" || !price.price.trim() || typeof price.tips !== "string")) {
           throw new Error("价格响应格式不正确");

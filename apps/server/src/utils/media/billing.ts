@@ -133,7 +133,8 @@ export async function getProviderPrice(provider: RuntimeProvider, request: Provi
   const entry = { expires: now + 30000, value: Promise.resolve<ProviderPrice | null>(null) };
   entry.value = (async () => {
     try {
-      const context = queryContext(provider, 8000);
+      // ACT: 估价改为手动点击后放宽到 25 秒，覆盖本地 CLI 类供应商的冷启动报价；前端等待须更长。
+      const context = queryContext(provider, 25000);
       const price = await waitForQuery(Promise.resolve().then(() => provider.getPrice!.call(context, request)), context.signal);
       return price === null ? null : priceSchema.parse(price);
     } catch (error) {
