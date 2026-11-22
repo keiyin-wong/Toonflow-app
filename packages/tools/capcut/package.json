@@ -1,0 +1,19 @@
+{
+  "name": "@toonflow/tool-capcut",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@toonflow/file": "workspace:*",
+    "zod": "4.6.2"
+  },
+  "devDependencies": {
+    "@toonflow/tools-scaffold": "workspace:*",
+    "@types/bun": "1.4.4",
+    "typescript": "6.0.3"
+  }
+}
