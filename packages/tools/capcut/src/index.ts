@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ToolPlugin } from "@toonflow/tools-scaffold/runtime";
 import { closeEditor, reopenEditor, writesDrafts } from "./app";
-import { draftRoots, prepareCapcut, runCapcut, version } from "./runtime";
+import { draftDirectories, prepareCapcut, runCapcut, version } from "./runtime";
 
 const configSchema = z.strictObject({});
 const runSchema = z.strictObject({
@@ -27,7 +27,7 @@ const plugin: ToolPlugin = {
       executionMode: "sequential",
       async execute(_id, _params, signal) {
         const result = await prepareCapcut(signal);
-        const roots = draftRoots();
+        const roots = draftDirectories();
         const text = JSON.stringify({ ...result, draftRoots: roots });
         return { content: [{ type: "text" as const, text }], details: { ...result, draftRoots: roots } };
       },

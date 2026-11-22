@@ -15,7 +15,8 @@ capcut 工具调用固定版本的 capcut-cli（非官方，与字节跳动无�
 ## 第一步：准备
 
 1. 调用 `capcutPrepare`。返回的 `draftRoots` 为空表示本机没有 CapCut / 剪映草稿目录：告诉用户先安装并打开过一次 CapCut，不要继续。
-2. 草稿目录在剪映（JianyingPro）而不是 CapCut 时，后续每条 capcut 命令的 `args` 都加 `--jianying`。
+2. 用户在 CapCut / 剪映设置里改过草稿位置时，工具会自动读到并写进那个目录（`draftRoots` 显示的就是实际位置）；这时 `doctor` 的 draft-dir 仍报默认位置找不到，可以忽略。
+3. 草稿目录在剪映（JianyingPro）而不是 CapCut 时，后续每条 capcut 命令的 `args` 都加 `--jianying`。
 
 ## 第二步：确定放哪些素材、什么顺序
 
