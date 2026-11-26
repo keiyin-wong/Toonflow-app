@@ -480,6 +480,11 @@ bun run start:server
 - 当前服务使用固定端口 `3000`，业务页面与 API 没有独立登录鉴权。服务器安装时，请通过防火墙或安全组限制 `3000` 端口的访问来源；公网访问需配置带认证的反向代理。
 - 个人远程使用可在自己的电脑上执行 `ssh -N -L 3000:127.0.0.1:3000 用户名@服务器地址`，保持连接后打开 `http://127.0.0.1:3000`，无需将服务器的 `3000` 端口向公网开放。
 - 直接安装时，配置、插件与工作区默认保存在仓库的 `data/`；Docker 安装则保存在数据卷内的 `/app/data/`。迁移或备份时请完整保留。进入页面后选择服务器工作区内的 `myProject`，更多项目可在对应的 `workspaces/` 下创建子目录。
+- 客户端安装时，Windows / macOS 的数据默认保存在安装目录下的 `data/`，Linux 保存在用户目录的 `toonflow/data`。
+- 想换数据位置时，设置环境变量 `TOONFLOW_DATA_DIR`，填数据目录的绝对路径。客户端、服务器安装和 `bun run start:server` 都会读取这个变量，设置后重新打开应用或重启服务才会生效。同一个数据目录不要同时被两个 Toonflow 使用。
+  - Windows（PowerShell，对当前用户长期生效）：`[Environment]::SetEnvironmentVariable('TOONFLOW_DATA_DIR', 'D:\Toonflow\data', 'User')`
+  - macOS / Linux（只对当前终端有效）：`export TOONFLOW_DATA_DIR=/path/to/toonflow/data`
+  - 改回默认位置：Windows 把上面的值换成 `$null` 再执行一次；macOS / Linux 执行 `unset TOONFLOW_DATA_DIR`。
 - 两种安装方式均包含系统 FFmpeg。模型服务的 API Key 仍需在页面内配置。
 
 ---
