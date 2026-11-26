@@ -18,11 +18,14 @@ import saveFile, { selectSaveFile } from "./saveFile";
 import createLinuxDebUpdater from "./update/linuxDebUpdater";
 import createWindowsUpdater, { confirmWindowsUpdateStartup } from "./update/windowsUpdater";
 import showWindowsNotification from "./windowsNotification";
+import startSubProxy from "./subProxy";
 import registerWindowAppearance from "./windowAppearance";
 
 const execFileAsync = promisify(execFile);
 const pendingInstalls: PluginInstallRequest[] = [];
 let deliverInstall: ((request: PluginInstallRequest) => void) | undefined;
+let stopSubProxy = () => {};
+process.on("exit", () => stopSubProxy());
 function openUrl(url: string) {
   const request = parseInstallUrl(url);
   if (deliverInstall) deliverInstall(request);
@@ -105,6 +108,7 @@ async function start() {
     const installDirectory = resolve(PATHS.RESOURCES_FOLDER, process.platform === "darwin" ? "../../.." : "../..");
     const dataDirectory = process.env.TOONFLOW_DATA_DIR ?? (process.platform === "linux"
       ? resolve(Utils.paths.appData, "toonflow/data") : resolve(installDirectory, "data"));
+    void startSubProxy(dataDirectory).then(stop => { stopSubProxy = stop; }).catch(error => console.error("Claude 订阅代理启动失败：", error));
     // ACT: 先显示原生动画，再加载服务，避免初始化期间没有反馈。
     const startupSettings = await file(resolve(dataDirectory, "settings.json")).json().catch((error) => {
       if (error.code !== "ENOENT") console.error("读取启动设置失败，使用默认启动动画：", error);
@@ -527,6 +531,7 @@ async function start() {
     }
     mainWindow.on("close", () => {
       isClosing = true;
+      stopSubProxy();
       closeCreationWindow();
       void connection.close().catch(error => console.error("设备连接关闭失败：", error));
       void closeBrowsers().catch(error => console.error("浏览器关闭失败：", error));
@@ -550,6 +555,7 @@ async function start() {
     }
   } catch (error) {
     isClosing = true;
+    stopSubProxy();
     closeCreationWindow();
     await desktopConnection?.close().catch(error => console.error("设备连接关闭失败：", error));
     splash?.close();

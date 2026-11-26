@@ -1,4 +1,5 @@
 import type { ElectrobunConfig } from "./.hutch/devkit/api/config/ElectrobunConfig";
+import { existsSync } from "@toonflow/file";
 import { fileURLToPath } from "node:url";
 
 const startupTarget = process.platform === "darwin" ? (process.arch === "x64" ? "macX64" : "macArm64")
@@ -38,6 +39,10 @@ export default {
       } : {}),
       ...(process.platform === "win32" && process.arch === "x64" ? {
         "build/desktop/startup/windowsSplashWorker.js": "startup/windowsSplashWorker.js",
+      } : {}),
+      // ACT: 只有 build.ts 编译出 Claude 订阅代理时才附带（见 apps/desktop/src/subProxy.ts）。
+      ...(existsSync(fileURLToPath(new URL("./build/desktop/proxy/claude-sub-proxy.exe", import.meta.url))) ? {
+        "build/desktop/proxy/claude-sub-proxy.exe": "claude-sub-proxy.exe",
       } : {}),
       ...(process.platform === "linux" ? {
         "build/desktop/linux/linuxLauncher.js": "linuxLauncher.js",

@@ -124,6 +124,18 @@ const photonDirectory = dirname(Bun.resolveSync("@silvia-odwyer/photon-node", ag
 const photonOutput = resolve(projectDir, "build/desktop/photon");
 rmSync(photonOutput, { recursive: true, force: true });
 cpSync(photonDirectory, photonOutput, { recursive: true });
+// ACT: 本机有 claude-sub-proxy（Claude 订阅代理，不在仓库里）时编译成单个 exe 随应用附带；没有则跳过，
+// 构建结果与官方一致。代理用电脑上已安装的 Claude Code，不附带它。
+const subProxyOutput = resolve(projectDir, "build/desktop/proxy");
+rmSync(subProxyOutput, { recursive: true, force: true });
+const subProxyDirectory = resolve(projectDir, "claude-sub-proxy");
+if (isWindows && process.arch === "x64" && mode !== "dev" && existsSync(resolve(subProxyDirectory, "server.mjs"))) {
+  if (!existsSync(resolve(subProxyDirectory, "node_modules/@anthropic-ai/claude-agent-sdk"))) {
+    console.warn("claude-sub-proxy 还没装依赖（在该目录运行 npm install），本次不附带 Claude 订阅代理。");
+  } else {
+    await $`${process.execPath} build server.mjs --compile --target=bun-windows-x64 --outfile ${resolve(subProxyOutput, "claude-sub-proxy.exe")}`.cwd(subProxyDirectory);
+  }
+}
 await copyDocumentPackages(resolve(projectDir, "build/desktop/node_modules"));
 await copySandboxPackages(resolve(projectDir, "build/desktop/node_modules"));
 const cli = resolve(projectDir, "apps/desktop/node_modules/electrobun/bin/electrobun.cjs");
