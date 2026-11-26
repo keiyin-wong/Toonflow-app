@@ -61,6 +61,24 @@ const peakRate = 50;
 /** 路径的短哈希，用于缓存文件名：同一文件重复生成时覆盖旧缓存。 */
 const pathKey = (path: string) => { let hash = 2166136261; for (const char of path) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619); return (hash >>> 0).toString(36); };
 const stripHeight = 90;
+/** 预览地址在没有片段使用后仍保留的文件数，来回拖动播放头时无需重新读取；更早的释放内存。 */
+const idleUrls = 6;
+
+/** 同时最多运行 `slots` 个任务，其余排队。 */
+function limiter(slots: number) {
+  const waiting: (() => void)[] = [];
+  return async <T>(task: () => Promise<T>): Promise<T> => {
+    if (slots > 0) slots--;
+    else await new Promise<void>(resolve => waiting.push(resolve));
+    try {
+      return await task();
+    } finally {
+      const next = waiting.shift();
+      if (next) next();
+      else slots++;
+    }
+  };
+}
 
 function isExists(error: unknown) {
   return axios.isAxiosError<{ data?: { code?: string } }>(error) && (error.response?.status === 409 || error.response?.data?.data?.code === "EEXIST");
@@ -71,13 +89,15 @@ export function createMedia(directory: string) {
   const files = useWorkspaceFiles(directory);
   const lifetime = new AbortController();
   let factory: Promise<BrowserFfmpegFactory> | undefined;
-  const urls = new Map<string, ReturnType<ReturnType<typeof useWorkspaceFiles>["acquireUrl"]>>();
+  /** 按最近使用排序（最后一项最新）。 */
+  const urls = new Map<string, { entry: ReturnType<ReturnType<typeof useWorkspaceFiles>["acquireUrl"]>; users: number }>();
   const probes = new Map<string, Promise<Probe>>();
   const peaks = new Map<string, Promise<{ rate: number; peaks: Uint8Array } | null>>();
   const strips = new Map<string, Promise<VideoStrip | null>>();
   const thumbs = new Map<string, Promise<string | null>>();
-  const thumbQueue: (() => void)[] = [];
-  let thumbSlots = 3;
+  // 素材多时不能一次启动几十个 FFmpeg：探测较轻，胶片条、波形与缩略图共用较少的名额。
+  const probeLimit = limiter(4);
+  const workLimit = limiter(2);
   const madeDirectories = new Set<string>();
   const stripUrls: string[] = [];
 
@@ -121,17 +141,59 @@ export function createMedia(directory: string) {
   /** 独占创建空输出，FFmpeg 仅覆盖本次操作已取得的文件；失败时保留，不自动删除。 */
   const freePath = (folder: string, name: string) => writeNew(folder, name, "");
 
-  /** 预览地址：每个文件读取一次并保留到面板关闭，避免片段进出播放窗口时重复读取。 */
-  function url(path: string, mimeType?: string) {
-    // ACT: 媒体整体读入内存生成 Blob 地址，工程素材总量即内存上限；需要时可改为支持 Range 的带令牌地址。
-    let entry = urls.get(path);
-    if (!entry) {
-      entry = files.acquireUrl(path, mimeType);
-      urls.set(path, entry);
-      void entry.url.catch(() => { if (urls.get(path) === entry) urls.delete(path); });
+  /** 释放超出 `idleUrls` 个、已无人使用的最旧预览地址。 */
+  function trimUrls() {
+    let idle = 0;
+    for (const held of urls.values()) if (!held.users) idle++;
+    for (const [path, held] of urls) {
+      if (idle <= idleUrls) break;
+      if (held.users) continue;
+      urls.delete(path);
+      held.entry.release();
+      idle--;
     }
-    return entry.url;
   }
+
+  /**
+   * 预览地址：使用者在离开（片段移出播放窗口、源监视器换文件）时调用 `release`。最近不再使用的几个文件仍保留，
+   * 其余释放，避免时间线上视频多时所有文件都留在内存里。
+   * ACT: 媒体整体读入内存生成 Blob 地址，同时使用的文件总量即内存上限；需要时可改为支持 Range 的带令牌地址。
+   */
+  function acquire(path: string) {
+    let held = urls.get(path);
+    if (held) urls.delete(path);
+    else {
+      const entry = files.acquireUrl(path);
+      const created = { entry, users: 0 };
+      held = created;
+      void entry.url.catch(() => {
+        if (urls.get(path) !== created) return;
+        urls.delete(path);
+        entry.release();
+      });
+    }
+    urls.set(path, held);
+    held.users++;
+    const current = held;
+    let released = false;
+    return {
+      url: current.entry.url,
+      release() {
+        if (released) return;
+        released = true;
+        if (--current.users) return;
+        // 刚释放的排到最新，最后才被清理。
+        if (urls.get(path) === current) {
+          urls.delete(path);
+          urls.set(path, current);
+        }
+        trimUrls();
+      },
+    };
+  }
+
+  /** 保留到面板关闭的预览地址（导出结果等少量文件）。 */
+  const url = (path: string) => acquire(path).url;
 
   /** 运行一条命令直到结束；`onProgress` 收到已处理的秒数。 */
   function run(command: BrowserFfmpegCommand, output: string, signal?: AbortSignal, onProgress?: (seconds: number) => void) {
@@ -167,7 +229,7 @@ export function createMedia(directory: string) {
   function probe(path: string) {
     let job = probes.get(path);
     if (!job) {
-      job = ffmpeg().then(factory => new Promise<Probe>((resolve, reject) => {
+      job = probeLimit(() => ffmpeg().then(factory => new Promise<Probe>((resolve, reject) => {
         factory.ffprobe(path, (error: unknown, data: FfprobeData) => {
           if (error) return reject(error);
           const video = data.streams.find(stream => stream.codec_type === "video");
@@ -179,7 +241,7 @@ export function createMedia(directory: string) {
           const duration = Number(data.format.duration);
           resolve({ duration: Number.isFinite(duration) && duration > 0 ? duration : null, width: turned ? height : width, height: turned ? width : height, video: !!video, audio });
         });
-      }));
+      })));
       probes.set(path, job);
       void job.catch(() => probes.delete(path));
     }
@@ -209,7 +271,7 @@ export function createMedia(directory: string) {
         const output = `${videoFolders.work}/cache/peaks-${pathKey(path)}.pcm`;
         await ensureDirectory(`${videoFolders.work}/cache`);
         const factory = await ffmpeg();
-        await run(factory(path).noVideo().audioChannels(1).audioFrequency(sampleRate).format("s16le"), output);
+        await workLimit(() => run(factory(path).noVideo().audioChannels(1).audioFrequency(sampleRate).format("s16le"), output));
         const view = new DataView(await files.read(output));
         const perPeak = sampleRate / peakRate;
         const values: number[] = [];
@@ -246,7 +308,7 @@ export function createMedia(directory: string) {
         const command = factory(path).noAudio().videoFilters(`fps=${count / info.duration},scale=${width}:${stripHeight},tile=${count}x1`).frames(1).outputOptions(["-q:v", "6"]);
         // 长文件只取关键帧，速度快得多，作为缩略图足够。
         if (info.duration > 300) command.inputOptions(["-skip_frame", "nokey"]);
-        await run(command, output);
+        await workLimit(() => run(command, output));
         const bytes = await files.read(output);
         lifetime.signal.throwIfAborted();
         const image = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
@@ -258,34 +320,27 @@ export function createMedia(directory: string) {
     return job;
   }
 
-  /** 图片或视频的小缩略图地址（视频取 0.5 秒处），素材网格与图片片段使用；同时最多生成 3 张。 */
+  /** 图片或视频的小缩略图地址（视频取 0.5 秒处），素材网格与图片片段使用。 */
   function thumbOf(path: string) {
     let job = thumbs.get(path);
     if (!job) {
-      job = (async () => {
-        await new Promise<void>(resolve => (thumbSlots > 0 ? (thumbSlots--, resolve()) : thumbQueue.push(resolve)));
-        try {
-          const output = `${videoFolders.work}/cache/thumb-${pathKey(path)}.jpg`;
-          await ensureDirectory(`${videoFolders.work}/cache`);
-          const factory = await ffmpeg();
-          const command = factory(path).noAudio().frames(1).videoFilters("scale='min(240,iw)':-2").outputOptions(["-q:v", "5"]);
-          if (mediaKind(path) === "video") command.seekInput(0.5);
-          await run(command, output).catch(error => {
-            // 极短的视频没有 0.5 秒处的画面，改取首帧。
-            if (mediaKind(path) !== "video") throw error;
-            return run(factory(path).noAudio().frames(1).videoFilters("scale='min(240,iw)':-2"), output);
-          });
-          const bytes = await files.read(output);
-          lifetime.signal.throwIfAborted();
-          const image = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
-          stripUrls.push(image);
-          return image;
-        } finally {
-          const next = thumbQueue.shift();
-          if (next) next();
-          else thumbSlots++;
-        }
-      })().catch(() => null);
+      job = workLimit(async () => {
+        const output = `${videoFolders.work}/cache/thumb-${pathKey(path)}.jpg`;
+        await ensureDirectory(`${videoFolders.work}/cache`);
+        const factory = await ffmpeg();
+        const command = factory(path).noAudio().frames(1).videoFilters("scale='min(240,iw)':-2").outputOptions(["-q:v", "5"]);
+        if (mediaKind(path) === "video") command.seekInput(0.5);
+        await run(command, output).catch(error => {
+          // 极短的视频没有 0.5 秒处的画面，改取首帧。
+          if (mediaKind(path) !== "video") throw error;
+          return run(factory(path).noAudio().frames(1).videoFilters("scale='min(240,iw)':-2"), output);
+        });
+        const bytes = await files.read(output);
+        lifetime.signal.throwIfAborted();
+        const image = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
+        stripUrls.push(image);
+        return image;
+      }).catch(() => null);
       thumbs.set(path, job);
     }
     return job;
@@ -386,10 +441,10 @@ export function createMedia(directory: string) {
 
   function dispose() {
     lifetime.abort(new DOMException("剪辑面板已关闭", "AbortError"));
-    for (const entry of urls.values()) entry.release();
+    for (const held of urls.values()) held.entry.release();
     urls.clear();
     for (const image of stripUrls) URL.revokeObjectURL(image);
   }
 
-  return { files, url, probe, clipFor, peaksOf, stripOf, thumbOf, still, convertRecording, importFile, renderFrame, runExport, writeNew, ensureDirectory, dispose };
+  return { files, url, acquire, probe, clipFor, peaksOf, stripOf, thumbOf, still, convertRecording, importFile, renderFrame, runExport, writeNew, ensureDirectory, dispose };
 }

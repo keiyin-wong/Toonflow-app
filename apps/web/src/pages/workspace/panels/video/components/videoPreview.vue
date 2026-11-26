@@ -84,11 +84,18 @@ const forward = computed(() => props.playing && props.rate > 0);
 const k = computed(() => stage.value.w / doc.value.width);
 const places = computed(() => placeAll(doc.value));
 const videoTracks = computed(() => videoTracksBackToFront(doc.value));
-const near = (id: string) => {
-  const place = places.value.get(id)!;
-  return time.value >= place.start - preload && time.value < place.end;
-};
+// 播放窗口内的片段：时间每帧都变，但集合只在片段进出窗口时变化。先算成字符串，内容不变时依赖它的列表不会重算，
+// 预览层级也不会每帧重新生成。
+const nearKey = computed(() => {
+  const now = time.value;
+  const ids: string[] = [];
+  for (const [id, place] of places.value) if (now >= place.start - preload && now < place.end) ids.push(id);
+  return ids.join("\n");
+});
+const nearIds = computed(() => new Set(nearKey.value ? nearKey.value.split("\n") : []));
+const near = (id: string) => nearIds.value.has(id);
 const layers = computed(() => videoTracks.value.flatMap((track, z) => (track.hidden ? [] : doc.value.clips.filter(clip => clip.track === track.id && clip.kind !== "effect" && !clip.hidden && near(clip.id)).map(clip => ({ clip, z })))));
+const length = computed(() => docLength(doc.value, places.value));
 // 隐藏轨道或隐藏片段不绘制画面，但声音照常播放（与导出一致）。
 const sounds = computed(() => [
   ...doc.value.tracks.filter(track => track.kind === "audio").flatMap(track => doc.value.clips.filter(clip => clip.track === track.id && near(clip.id)).map(clip => ({ clip, muted: !!track.muted }))),
@@ -151,8 +158,17 @@ watchEffect(() => {
   const now = time.value;
   if (!canvas || !context) return;
   const ratio = devicePixelRatio || 1;
-  canvas.width = Math.max(1, Math.round(stage.value.w * ratio));
-  canvas.height = Math.max(1, Math.round(stage.value.h * ratio));
+  // 每帧重设尺寸会重新分配画布，尺寸不变时只清空。
+  const width = Math.max(1, Math.round(stage.value.w * ratio));
+  const height = Math.max(1, Math.round(stage.value.h * ratio));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  } else {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.globalAlpha = 1;
+    context.clearRect(0, 0, width, height);
+  }
   context.setTransform(canvas.width / value.width, 0, 0, canvas.height / value.height, 0, 0);
   for (const track of textTracksBackToFront(value)) {
     if (track.hidden) continue;
@@ -180,7 +196,7 @@ watch([() => props.playing, () => props.rate < 0], ([playing]) => {
   let last = performance.now();
   const tick = (now: number) => {
     const value = doc.value;
-    const placeMap = placeAll(value);
+    const placeMap = places.value;
     const start = time.value;
     const rate = props.rate;
     let next = start + ((now - last) / 1000) * rate;
@@ -203,7 +219,7 @@ watch([() => props.playing, () => props.rate < 0], ([playing]) => {
       if (!element.paused && !element.seeking && element.readyState >= 3) next = place.start + (element.currentTime - master.in) / (master.speed ?? 1);
       else if (!element.ended) next = start;
     }
-    const end = docLength(value, placeMap);
+    const end = length.value;
     if (next >= end) {
       emit("time", end);
       emit("ended");

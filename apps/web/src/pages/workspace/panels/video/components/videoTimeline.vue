@@ -48,8 +48,8 @@
               :style="{ left: `${places.get(clip.id)!.start * pps}px`, width: `${clipWidth(clip.id)}px` }" :title="clipTitle(clip)"
               @pointerdown="startMove($event, clip.id, !!track.locked)" @contextmenu.stop.prevent="openMenu($event, clip.id, track)">
               <span v-if="places.get(clip.id)!.into" class="clipTransition" :style="{ width: `${places.get(clip.id)!.into!.d * pps}px` }" :title="`${transitionNames[places.get(clip.id)!.into!.kind]} ${places.get(clip.id)!.into!.d.toFixed(2)}s`" />
-              <clipFilmstrip v-if="track.kind === 'video' && clip.kind !== 'effect' && clipWidth(clip.id) > 12" :clip="clip" :left="places.get(clip.id)!.start * pps" :width="clipWidth(clip.id)" :height="rowHeight(track) - 6" :pps="pps" :view="view" />
-              <clipWaveform v-if="track.kind === 'audio' && clipWidth(clip.id) > 8" :clip="clip" />
+              <clipFilmstrip v-if="track.kind === 'video' && clip.kind !== 'effect' && clipWidth(clip.id) > 12" :clip="clip" :left="places.get(clip.id)!.start * pps" :width="clipWidth(clip.id)" :height="rowHeight(track) - 6" :pps="pps" />
+              <clipWaveform v-if="track.kind === 'audio' && clipWidth(clip.id) > 8" :clip="clip" :left="places.get(clip.id)!.start * pps" :width="clipWidth(clip.id)" />
               <span class="clipName">{{ clipLabel(clip) }}</span>
               <span v-if="clip.kind !== 'effect' && hasFx(clip)" class="clipFx" title="已添加效果">fx</span>
               <span v-for="key in keyTimes(clip).filter(value => value <= places.get(clip.id)!.end - places.get(clip.id)!.start + 1e-3)" :key="key" class="clipKey" :style="{ left: `${key * pps}px` }"
@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, provide, ref, shallowRef, watch } from "vue";
 import { t, translate } from "@toonflow/i18n/vue";
 import { IconEye, IconEyeOff, IconLock, IconLockOpen, IconVolume, IconVolumeOff } from "@tabler/icons-vue";
 import type { VideoClip, VideoDoc, VideoTrack } from "../types";
@@ -134,7 +134,9 @@ let drag: Drag | null = null;
 const dropAt = ref<{ track: string; t: number } | null>(null);
 const guide = ref<number | null>(null);
 const box = ref<{ x: number; y: number; w: number; h: number } | null>(null);
-const view = ref({ left: 0, width: 1200 });
+/** 轨道区域的可见范围：经 provide 交给胶片条与波形，滚动时不重新渲染整条时间线。 */
+const view = shallowRef({ left: 0, width: 1200 });
+provide("timelineView", view);
 const places = computed(() => placeAll(doc.value));
 const length = computed(() => docLength(doc.value, places.value));
 const width = computed(() => (length.value + 30) * props.pps);

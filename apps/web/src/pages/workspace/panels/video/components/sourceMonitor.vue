@@ -99,13 +99,22 @@ const percent = (value: number) => `${duration.value ? (value / duration.value) 
 const setNatural = (w: number, h: number) => { natural.value = { w, h }; };
 const sync = () => { if (mediaElement.value) time.value = mediaElement.value.currentTime; };
 
+let held: ReturnType<Media["acquire"]> | undefined;
 watch(() => props.source?.path, path => {
   time.value = props.marks.in ?? 0;
   playing.value = false;
   natural.value = { w: 0, h: 0 };
   src.value = "";
-  if (path) void media.url(path).then(url => { if (props.source?.path === path) src.value = url; }, () => {});
+  held?.release();
+  held = undefined;
+  if (!path) return;
+  const current = held = media.acquire(path);
+  void current.url.then(url => { if (held === current) src.value = url; }, () => {});
 }, { immediate: true });
+onBeforeUnmount(() => {
+  held?.release();
+  held = undefined;
+});
 
 let observer: ResizeObserver | undefined;
 watch(viewElement, element => {

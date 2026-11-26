@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watch, watchEffect } from "vue";
+import { inject, onBeforeUnmount, ref, watch, watchEffect } from "vue";
 import type { VideoClip } from "../types";
 import { syncElement, type Media } from "../media";
 import { gainAt, type Place } from "../videoModel";
@@ -14,10 +14,17 @@ const media = inject<Media>("videoMedia")!;
 const audioElement = ref<HTMLAudioElement>();
 const src = ref("");
 
+let held: ReturnType<Media["acquire"]> | undefined;
 watch(() => props.clip.src, path => {
   src.value = "";
-  void media.url(path).then(url => { if (props.clip.src === path) src.value = url; }, () => {});
+  held?.release();
+  const current = held = media.acquire(path);
+  void current.url.then(url => { if (held === current) src.value = url; }, () => {});
 }, { immediate: true });
+onBeforeUnmount(() => {
+  held?.release();
+  held = undefined;
+});
 
 watchEffect(() => {
   const { clip, place, time, playing, rate, muted } = props;

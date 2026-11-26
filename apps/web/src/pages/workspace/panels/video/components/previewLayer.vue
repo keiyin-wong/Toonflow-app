@@ -31,13 +31,20 @@ const backElement = ref<HTMLVideoElement>();
 const src = ref("");
 const isVideo = computed(() => props.clip.kind === "video");
 
+let held: ReturnType<Media["acquire"]> | undefined;
 watch(() => props.clip.src, path => {
   src.value = "";
-  void media.url(path).then(url => { if (props.clip.src === path) src.value = url; }, () => {});
+  held?.release();
+  const current = held = media.acquire(path);
+  void current.url.then(url => { if (held === current) src.value = url; }, () => {});
 }, { immediate: true });
 
 onMounted(() => { if (mainElement.value) elements.set(props.clip.id, mainElement.value); });
-onBeforeUnmount(() => elements.delete(props.clip.id));
+onBeforeUnmount(() => {
+  elements.delete(props.clip.id);
+  held?.release();
+  held = undefined;
+});
 
 watchEffect(() => {
   const { clip, place, time, playing, doc, rate, trackMuted } = props;

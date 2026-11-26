@@ -5,18 +5,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, shallowRef, watch } from "vue";
+import { computed, inject, shallowRef, watch, type ShallowRef } from "vue";
 import type { VideoClip } from "../types";
 import type { Media } from "../media";
 
-/** 声音片段裁剪部分的响度，以填充形状拉伸到片段宽度（音量调高时更高）。 */
-const props = defineProps<{ clip: VideoClip }>();
+/** 声音片段裁剪部分的响度，以填充形状拉伸到片段宽度（音量调高时更高）。片段第一次接近可见范围时才计算。 */
+const props = defineProps<{ clip: VideoClip; left: number; width: number }>();
 const media = inject<Media>("videoMedia")!;
+const view = inject<ShallowRef<{ left: number; width: number }>>("timelineView")!;
 const data = shallowRef<{ rate: number; peaks: Uint8Array } | null>(null);
+const nearView = computed(() => props.left + props.width >= view.value.left - view.value.width && props.left <= view.value.left + 2 * view.value.width);
+const wanted = shallowRef<string | null>(null);
+watch([() => props.clip.src, nearView], ([src, near]) => { if (near) wanted.value = src; else if (wanted.value !== src) wanted.value = null; }, { immediate: true });
 
-watch(() => props.clip.src, src => {
+watch(wanted, src => {
   data.value = null;
-  void media.peaksOf(src).then(value => { if (props.clip.src === src) data.value = value; });
+  if (src) void media.peaksOf(src).then(value => { if (wanted.value === src) data.value = value; });
 }, { immediate: true });
 
 const shape = computed(() => {
