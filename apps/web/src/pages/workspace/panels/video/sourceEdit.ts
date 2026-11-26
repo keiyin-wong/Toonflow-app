@@ -9,6 +9,8 @@ const edgeEps = 1e-3;
 export const sourceDragType = "application/x-toonflow-video-source";
 /** 素材面板拖动文件到轨道的数据类型（工作区相对路径数组）。 */
 export const assetDragType = "application/x-toonflow-video-assets";
+/** 在线曲库拖动歌曲到轨道的数据类型（JSON：{ url, name }，放下时才下载导入）。 */
+export const onlineMusicDragType = "application/x-toonflow-online-music";
 
 /** 源监视器在文件上的标记：文件内秒数，null 表示文件开头 / 结尾。 */
 export interface SourceMarks { in: number | null; out: number | null }

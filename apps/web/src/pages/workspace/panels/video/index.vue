@@ -78,7 +78,7 @@
       <div class="videoUpper">
         <section v-if="assetsOpen" class="videoCard assetsCard" :style="{ width: `${assetsWidth}px` }">
           <assetsPanel :key="projectPath" :history="history" :directory="directory" :used="usedPaths" :refresh="refresh" :pictureClips="selectedPictures.length" :magneticClips="selectedJoins.length"
-            @open="openSource" @add="addToTimeline" @menu="assetMenu" @fromCanvas="canvasPickerVisible = true" @importFiles="importFiles"
+            @open="openSource" @add="addToTimeline" @menu="assetMenu" @fromCanvas="canvasPickerVisible = true" @importFiles="importFiles" @addOnlineAudio="addOnlineAudio"
             @addText="(text, style) => addItem({ text, style })" @addShape="kind => addItem({ text: '', style: shapeStyle, shape: newShape(kind, doc.width / doc.height) })"
             @addSticker="emoji => addItem({ text: emoji, style: { ...shapeStyle, size: 12, font: 'Segoe UI Emoji' } })" @addEffect="addEffect"
             @look="name => history.set(patchClips(history.content.value, selectedPictures.map(clip => clip.id), lookPatch(name)))"
@@ -172,7 +172,7 @@
           <el-button size="small" text title="缩放到显示整个视频" @click="fitTimeline">适应</el-button>
         </div>
         <videoTimeline ref="timelineRef" :history="history" :time="time" :pps="pps" :selection="selection" :snapping="snapping" :heights="heights" :range="range"
-          @pps="value => (pps = value)" @select="ids => (selection = ids)" @seek="seek" @drop="onDrop" @sourceDrop="dropSource" @menu="timelineMenu" @addTrack="kind => history.set(addTrack(history.content.value, kind).doc)" @height="setHeight" />
+          @pps="value => (pps = value)" @select="ids => (selection = ids)" @seek="seek" @drop="onDrop" @sourceDrop="dropSource" @onlineDrop="(music, track, at) => addOnlineAudio(music.url, music.name, track, at)" @menu="timelineMenu" @addTrack="kind => history.set(addTrack(history.content.value, kind).doc)" @height="setHeight" />
       </section>
     </template>
 
@@ -199,6 +199,7 @@ import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, provi
 import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { msg, t, translate } from "@toonflow/i18n/vue";
+import { capcutMusicEnabled } from "@toonflow/server/capcutMusic";
 import { IconPlayerPauseFilled, IconPlayerPlayFilled } from "@tabler/icons-vue";
 import { useWorkspaceStore } from "@/stores/workspace";
 import type { VideoClip, VideoDirection, VideoDoc, VideoEffectKind, VideoExportOptions, VideoShape, VideoTextStyle, VideoTrack, VideoTransitionKind } from "./types";
@@ -668,6 +669,31 @@ async function importFiles(files: File[]) {
     busy.value = "";
     refresh.value++;
     for (const path of paths) addToTimeline(path);
+  } catch (error) {
+    if (currentSession(session)) {
+      busy.value = "";
+      report(error);
+    }
+  }
+}
+
+/** 下载在线曲库的歌曲并导入；拖到轨道时放在落点，点 + 时放在播放头。 */
+async function addOnlineAudio(url: string, name: string, track?: VideoTrack, at?: number) {
+  if (!capcutMusicEnabled) return;
+  const session = projectSession;
+  try {
+    busy.value = translate("正在下载音乐…");
+    const resp = await fetch(`/api/music/download?url=${encodeURIComponent(url)}`);
+    if (!resp.ok) throw new Error(translate("下载失败"));
+    const blob = await resp.blob();
+    if (!currentSession(session)) return;
+    const file = new File([blob], name, { type: blob.type || "audio/mpeg" });
+    const path = await media.importFile(file);
+    if (!currentSession(session)) return;
+    busy.value = "";
+    refresh.value++;
+    if (track) void addFiles([path], track, at ?? null);
+    else addToTimeline(path);
   } catch (error) {
     if (currentSession(session)) {
       busy.value = "";

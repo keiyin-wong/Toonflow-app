@@ -6,7 +6,8 @@ import { dirname, resolve } from "node:path";
 import { lstat, readFile, readdir, unlink } from "@toonflow/file";
 import type { Request, Response, NextFunction } from "express";
 import buildRoute from "@/core";
-import { errorFromCause } from "@/lib/responseFormat";
+import { error, errorFromCause } from "@/lib/responseFormat";
+import { capcutMusicEnabled } from "@/lib/capcutMusic";
 import desktopRequest from "@/lib/desktop";
 import { getRuntimePlatform } from "@/lib/platform";
 import initializePlugins from "@/utils/plugins/initialize";
@@ -113,6 +114,11 @@ export async function createApp({
   const { initializeMultiTenantRuntime, multiTenantAccess } = await import("@/utils/multiTenant/runtime");
   initializeMultiTenantRuntime(app);
   app.use(multiTenantAccess);
+  if (!capcutMusicEnabled) {
+    app.use("/api/music", (_req, res) => {
+      res.set("Cache-Control", "no-store").status(503).json(error("CapCut 在线曲库已暂停", null, 503));
+    });
+  }
   const { initializePluginServerRuntime } = await import("@/utils/pluginServer");
   initializePluginServerRuntime(app);
   app.use("/api/pluginServer/message", express.json({ limit: "12mb" }));

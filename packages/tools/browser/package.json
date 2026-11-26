@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./host": "./src/host.ts",
+    "./capcutMusic": "./src/capcutMusic.ts",
     "./protocol": "./src/protocol.ts",
     "./panel": "./src/browserPanel.vue",
     "./client": "./src/client.ts"

@@ -9,12 +9,17 @@
       <template v-if="tab === 'media' || tab === 'audio'">
         <div class="panelHead">
           <span class="panelTitle">{{ tab === "audio" ? translate("音乐与音效") : translate("素材") }}</span>
+          <div v-if="tab === 'audio' && capcutMusicEnabled" class="subTabs">
+            <button :class="{ on: audioView === 'online' }" @click="audioView = 'online'">{{ translate("在线曲库") }}</button>
+            <button :class="{ on: audioView === 'local' }" @click="audioView = 'local'">{{ translate("本地") }}</button>
+          </div>
           <span class="spacer" />
           <button v-if="tab === 'media'" class="iconButton" title="从画布挑选视频与图片" @click="emit('fromCanvas')"><icon-vector :size="16" /></button>
-          <el-button size="small" title="从本机导入文件到工作区并放到时间线" @click="fileInput?.click()"><icon-upload :size="14" />&nbsp;导入</el-button>
+          <el-button v-if="tab === 'media' || audioView === 'local'" size="small" title="从本机导入文件到工作区并放到时间线" @click="fileInput?.click()"><icon-upload :size="14" />&nbsp;导入</el-button>
           <input ref="fileInput" type="file" multiple hidden :accept="tab === 'audio' ? 'audio/*' : 'video/*,image/*,audio/*'" @change="importFiles" />
         </div>
-        <mediaGrid :key="tab" :directory="directory" :used="used" :kind="tab === 'audio' ? 'audio' : 'all'" :refresh="refresh" @open="path => emit('open', path)" @add="path => emit('add', path)" @menu="(event, path) => emit('menu', event, path)" />
+        <musicLibrary v-if="tab === 'audio' && capcutMusicEnabled && audioView === 'online'" @add="(url, name) => emit('addOnlineAudio', url, name)" />
+        <mediaGrid v-else :key="tab" :directory="directory" :used="used" :kind="tab === 'audio' ? 'audio' : 'all'" :refresh="refresh" @open="path => emit('open', path)" @add="path => emit('add', path)" @menu="(event, path) => emit('menu', event, path)" />
       </template>
 
       <div v-else-if="tab === 'text'" class="assetsPane">
@@ -131,9 +136,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineAsyncComponent, onBeforeUnmount, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { msg, t, translate } from "@toonflow/i18n/vue";
+import { capcutMusicEnabled } from "@toonflow/server/capcutMusic";
 import { IconAdjustmentsHorizontal, IconChevronsRight, IconFolder, IconMusic, IconShape, IconSparkles, IconSticker, IconSubtitles, IconTypography } from "@tabler/icons-vue";
 import type { VideoBlend, VideoDirection, VideoDoc, VideoEffectKind, VideoShape, VideoTextStyle, VideoTrack, VideoTransitionKind } from "../types";
 import type { History } from "../useHistory";
@@ -153,6 +159,7 @@ const emit = defineEmits<{
   addText: [text: string, style: VideoTextStyle]; addShape: [kind: VideoShape["kind"]]; addSticker: [emoji: string]; addEffect: [kind: VideoEffectKind];
   look: [name: string]; blend: [blend: VideoBlend]; transition: [kind: VideoTransitionKind | "cut", duration: number, direction?: VideoDirection];
   importSrt: [text: string, name: string, track: string]; exportSrt: [track: VideoTrack];
+  addOnlineAudio: [url: string, name: string];
 }>();
 const tabs: { id: Tab; label: ReturnType<typeof msg>; icon: unknown }[] = [
   { id: "media", label: msg`素材`, icon: IconFolder },
@@ -167,6 +174,8 @@ const tabs: { id: Tab; label: ReturnType<typeof msg>; icon: unknown }[] = [
 ];
 const tab = ref<Tab>((localStorage.getItem("toonflow:videoAssetsTab") as Tab) || "media");
 watch(tab, value => localStorage.setItem("toonflow:videoAssetsTab", value));
+const musicLibrary = defineAsyncComponent(() => import("./musicLibrary.vue"));
+const audioView = ref<"online" | "local">(capcutMusicEnabled ? "online" : "local");
 const fileInput = ref<HTMLInputElement>();
 const srtInput = ref<HTMLInputElement>();
 const duration = ref<number | null>(null);
@@ -261,6 +270,15 @@ async function importSrt(event: Event) {
     border-bottom: 1px solid var(--el-border-color-lighter);
 
     .panelTitle { font-size: 13px; font-weight: 600; }
+    .subTabs {
+      display: flex;
+      gap: 2px;
+      margin-left: 8px;
+
+      button { padding: 2px 8px; border: none; border-radius: 5px; background: none; color: var(--el-text-color-secondary); font-size: 12px; cursor: pointer; }
+      button:hover { background: var(--el-fill-color-light); }
+      button.on { background: color-mix(in srgb, var(--el-color-primary) 14%, transparent); color: var(--el-color-primary); }
+    }
     .spacer { flex: 1; }
     .iconButton { display: inline-flex; padding: 4px; border: none; border-radius: 5px; background: none; color: var(--el-text-color-regular); cursor: pointer; }
     .iconButton:hover { background: var(--el-fill-color-light); }

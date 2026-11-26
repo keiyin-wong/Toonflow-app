@@ -10,6 +10,7 @@ import { resolve } from "node:path";
 import { promisify } from "node:util";
 import { dlopen, ptr } from "bun:ffi";
 import type { DesktopRuntime, PluginInstallRequest } from "@toonflow/server/desktop";
+import { capcutMusicEnabled } from "@toonflow/server/capcutMusic";
 import { showNativeSplash } from "@toonflow/startup";
 import Electrobun, { ApplicationMenu, BrowserWindow, PATHS, Screen, Utils, Updater } from "electrobun/main";
 import { parseInstallUrl } from "./protocol";
@@ -482,6 +483,8 @@ async function start() {
         else await (Updater as DesktopRuntime["updater"]).confirmStartup?.();
       },
       openDevTools() { mainWindow.webview.openDevTools(); },
+      // 内嵌 CapCut 曲库：懒创建隐藏 webview，首次搜索/登录时才真正加载页面。
+      capcutMusic: capcutMusicEnabled ? (await import("./capcutMusic")).createCapcutMusic() : undefined,
       updater: {
         ...updater,
         applyUpdate: async () => {

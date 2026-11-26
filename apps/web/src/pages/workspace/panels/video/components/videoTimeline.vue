@@ -86,7 +86,7 @@ import { t, translate } from "@toonflow/i18n/vue";
 import { IconEye, IconEyeOff, IconLock, IconLockOpen, IconVolume, IconVolumeOff } from "@tabler/icons-vue";
 import type { VideoClip, VideoDoc, VideoTrack } from "../types";
 import type { History } from "../useHistory";
-import { assetDragType, sourceDragType } from "../sourceEdit";
+import { assetDragType, onlineMusicDragType, sourceDragType } from "../sourceEdit";
 import { docLength, fits, insertIndex, keyTimes, patchTexts, patchTracks, placeAll, placeClip, rulerSteps, snap, snapPoints, timecode, transitionNames, trim } from "../timeline";
 import liveTime from "./liveTime.vue";
 import timelinePlayhead from "./timelinePlayhead.vue";
@@ -108,7 +108,7 @@ const props = defineProps<{
   range: ProgramRange;
 }>();
 const emit = defineEmits<{
-  pps: [pps: number]; select: [ids: string[]]; seek: [time: number]; drop: [paths: string[], track: VideoTrack, time: number]; sourceDrop: [track: VideoTrack, time: number];
+  pps: [pps: number]; select: [ids: string[]]; seek: [time: number]; drop: [paths: string[], track: VideoTrack, time: number]; sourceDrop: [track: VideoTrack, time: number]; onlineDrop: [music: { url: string; name: string }, track: VideoTrack, time: number];
   menu: [event: MouseEvent, target: MenuTarget, time: number]; addTrack: [kind: VideoTrack["kind"]]; height: [trackId: string, height: number | null];
 }>();
 
@@ -355,7 +355,7 @@ function up(event: PointerEvent) {
 // 素材面板拖入的文件与源监视器的标记区间。
 function dragOver(event: DragEvent, track: VideoTrack) {
   const types = event.dataTransfer?.types ?? [];
-  if (!(types.includes(assetDragType) || types.includes(sourceDragType)) || track.locked) return;
+  if (!(types.includes(assetDragType) || types.includes(sourceDragType) || types.includes(onlineMusicDragType)) || track.locked) return;
   event.preventDefault();
   event.dataTransfer!.dropEffect = "copy";
   dropAt.value = { track: track.id, t: timeAt(event.clientX) };
@@ -367,6 +367,11 @@ function drop(event: DragEvent, track: VideoTrack) {
   if (event.dataTransfer.types.includes(sourceDragType)) {
     event.preventDefault();
     return emit("sourceDrop", track, timeAt(event.clientX));
+  }
+  const music = event.dataTransfer.getData(onlineMusicDragType);
+  if (music) {
+    event.preventDefault();
+    return emit("onlineDrop", JSON.parse(music) as { url: string; name: string }, track, timeAt(event.clientX));
   }
   const raw = event.dataTransfer.getData(assetDragType);
   if (!raw) return;
