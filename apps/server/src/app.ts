@@ -14,8 +14,8 @@ import initializePlugins from "@/utils/plugins/initialize";
 import { languageRequest, setLocaleFallback, translateError, translateMessage } from "@/lib/i18n";
 import { detectLocale, normalizeLocale } from "@toonflow/i18n";
 
-// 上游内置供应商已改为在线渠道；本分支仅保留本地 Dreamina 的自动安装。
-const autoInstallProviders = ["dreamina.ts"];
+// 上游内置供应商已改为在线渠道；本分支保留本地 CLI 供应商的自动安装。
+const autoInstallProviders = ["dreamina.ts", "higgsfield.ts"];
 
 export async function createApp({
   webRoot,
